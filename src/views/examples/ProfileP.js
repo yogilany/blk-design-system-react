@@ -36,11 +36,15 @@ import {
   Container,
   Row,
   Col,
+  Modal,
+  Alert,
 } from "reactstrap";
 
 // core components
 import ExamplesNavbar from "components/Navbars/ExamplesNavbar.js";
 import Footer from "components/Footer/Footer.js";
+import axios from "axios";
+import dayjs from "dayjs";
 
 export default function Profile() {
   const [squares1to6, setSquares1to6] = React.useState("");
@@ -48,7 +52,59 @@ export default function Profile() {
   const [fullNameFocus, setFullNameFocus] = React.useState(false);
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
+  const [formModal, setFormModal] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+  const [isFailed, setIsFiled] = React.useState(false);
+
+  const [userData, setUserData] = React.useState({
+    user_name: "",
+    fname: "",
+    lname: "",
+    bdate: "",
+    gender: "",
+    email: "",
+    password: "",
+    nationality: "",
+    role: "fan",
+  });
+
+  const fetchProfile = async () => {
+    const userName = localStorage.getItem("username");
+    const r = await axios
+      .get(`https://world-cup-backend-g3yn.onrender.com/api/users/${userName}`)
+      .then((res) => {
+        console.log(res.data.data);
+        setUserData(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const formChangeHandler = (e) => {
+    setUserData({ ...userData, [e.target.name]: e.target.value });
+  };
+
+  const updateUser = () => {
+    axios
+      .patch("https://careful-elk-petticoat.cyclic.app/api/users/", userData)
+      .then((res) => {
+        console.log("response: ", res);
+        setIsSuccess(true);
+        setIsFiled(false);
+        fetchProfile();
+      })
+      .catch((err) => {
+        console.log("error: ", err);
+        setIsSuccess(false);
+        setIsFiled(true);
+      })();
+  };
+
   React.useEffect(() => {
+    fetchProfile();
     document.body.classList.toggle("register-page");
     document.documentElement.addEventListener("mousemove", followCursor);
     // Specify how to clean up after this effect:
@@ -57,6 +113,7 @@ export default function Profile() {
       document.documentElement.removeEventListener("mousemove", followCursor);
     };
   }, []);
+
   const followCursor = (event) => {
     let posX = event.clientX - window.innerWidth / 2;
     let posY = event.clientY - window.innerWidth / 6;
@@ -111,13 +168,10 @@ export default function Profile() {
                     <CardBody>
                       <div className="px-md-2">
                         <hr className="line-success" />
-                        <h3>Yousef Gilany</h3>
-                        <img
-                          alt="..."
-                          className="img-fluid rounded shadow-lg"
-                          src={require("assets/img/lora.jpg")}
-                          style={{ width: "150px" }}
-                        />
+                        <h3>
+                          {userData.fname} {userData.lname}
+                        </h3>
+
                         {/* <p>
                           The design system comes with three pre-built pages to
                           help you get started faster. You can change the text
@@ -127,20 +181,10 @@ export default function Profile() {
                           <li className="py-2">
                             <div className="d-flex align-items-center">
                               <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-vector" />
+                                <i className="tim-icons icon-single-02" />
                               </div>
                               <div className="ml-3">
-                                <h6>2002-02-03</h6>
-                              </div>
-                            </div>
-                          </li>
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-tap-02" />
-                              </div>
-                              <div className="ml-3">
-                                <h6>Egyptian</h6>
+                                <h6>{userData.user_name}</h6>
                               </div>
                             </div>
                           </li>
@@ -150,7 +194,52 @@ export default function Profile() {
                                 <i className="tim-icons icon-single-02" />
                               </div>
                               <div className="ml-3">
-                                <h6>Manager</h6>
+                                <h6>{userData.email}</h6>
+                              </div>
+                            </div>
+                          </li>
+                          <li className="py-2">
+                            <div className="d-flex align-items-center">
+                              <div className="icon icon-success mb-2">
+                                <i className="tim-icons icon-vector" />
+                              </div>
+                              <div className="ml-3">
+                                <h6>
+                                  {dayjs(userData.bdate).format("YYYY-MM-DD")}
+                                </h6>
+                              </div>
+                            </div>
+                          </li>
+                          <li className="py-2">
+                            <div className="d-flex align-items-center">
+                              <div className="icon icon-success mb-2">
+                                <i className="tim-icons icon-tap-02" />
+                              </div>
+                              <div className="ml-3">
+                                <h6>{userData.nationality}</h6>
+                              </div>
+                            </div>
+                          </li>
+                          <li className="py-2">
+                            <div className="d-flex align-items-center">
+                              <div className="icon icon-success mb-2">
+                                <i className="tim-icons icon-single-02" />
+                              </div>
+                              <div className="ml-3">
+                                <h6>
+                                  {userData.gender === "M" ? "Male" : "Female"}
+                                </h6>
+                              </div>
+                            </div>
+                          </li>
+
+                          <li className="py-2">
+                            <div className="d-flex align-items-center">
+                              <div className="icon icon-success mb-2">
+                                <i className="tim-icons icon-single-02" />
+                              </div>
+                              <div className="ml-3">
+                                <h6>{userData.role}</h6>
                               </div>
                             </div>
                           </li>
@@ -158,10 +247,181 @@ export default function Profile() {
                       </div>
                     </CardBody>
                     <CardFooter>
-                      <Button className="btn-round" color="primary" size="md">
+                      <Button
+                        className="btn-round"
+                        color="primary"
+                        size="md"
+                        onClick={() => setFormModal(true)}
+                      >
                         Edit profile
                       </Button>
                     </CardFooter>
+                    <Modal
+                      modalClassName="modal-black"
+                      isOpen={formModal}
+                      toggle={() => setFormModal(false)}
+                    >
+                      <div className="modal-header justify-content-center">
+                        <button
+                          className="close"
+                          onClick={() => setFormModal(false)}
+                        >
+                          <i className="tim-icons icon-simple-remove text-white" />
+                        </button>
+                        <div className="text-muted text-center ml-auto mr-auto">
+                          <h3 className="mb-0">Edit my information</h3>
+                        </div>
+                      </div>
+                      <div className="modal-body">
+                        <Form className="form">
+                          <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder={userData.fname}
+                              type="text"
+                              name="fname"
+                              onChange={formChangeHandler}
+                              required
+                            />
+                          </InputGroup>
+                          <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder={userData.lname}
+                              type="text"
+                              name="lname"
+                              onChange={formChangeHandler}
+                              required
+                            />
+                          </InputGroup>
+                          <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder={userData.user_name}
+                              type="text"
+                              name="user_name"
+                              onChange={formChangeHandler}
+                              required
+                            />
+                          </InputGroup>
+                          <InputGroup
+                            className={classnames({
+                              "input-group-focus": emailFocus,
+                            })}
+                          >
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder={userData.email}
+                              type="text"
+                              name="email"
+                              onChange={formChangeHandler}
+                              onFocus={(e) => setEmailFocus(true)}
+                              onBlur={(e) => setEmailFocus(false)}
+                              required
+                            />
+                          </InputGroup>
+                          <InputGroup
+                            className={classnames({
+                              "input-group-focus": passwordFocus,
+                            })}
+                          >
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder="Password"
+                              name="password"
+                              onChange={formChangeHandler}
+                              type="password"
+                              onFocus={(e) => setPasswordFocus(true)}
+                              onBlur={(e) => setPasswordFocus(false)}
+                              required
+                            />
+                          </InputGroup>
+                          <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder="Birth Date"
+                              type="date"
+                              name="bdate"
+                              onChange={formChangeHandler}
+                              required
+                            />
+                          </InputGroup>
+                          <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                              <InputGroupText></InputGroupText>
+                            </InputGroupAddon>
+                            <Input
+                              placeholder={userData.nationality}
+                              type="text"
+                              name="nationality"
+                              onChange={formChangeHandler}
+                              required
+                            />
+                          </InputGroup>
+                          <FormGroup check className="form-check-radio">
+                            <Label check>
+                              <Input
+                                defaultValue="M"
+                                defaultChecked={
+                                  userData.gender === "M" ? true : false
+                                }
+                                id="gender"
+                                name="gender"
+                                type="radio"
+                                onChange={formChangeHandler}
+                              />
+                              <span className="form-check-sign" />
+                              Male
+                            </Label>
+                          </FormGroup>
+                          <FormGroup check className="form-check-radio">
+                            <Label check>
+                              <Input
+                                defaultChecked={
+                                  userData.gender === "F" ? true : false
+                                }
+                                id="gender"
+                                name="gender"
+                                type="radio"
+                                onChange={formChangeHandler}
+                              />
+                              <span className="form-check-sign" />
+                              Female
+                            </Label>
+                          </FormGroup>
+                        </Form>
+                        <Button
+                          className="btn-round"
+                          color="primary"
+                          size="md"
+                          onClick={updateUser}
+                        >
+                          Save
+                        </Button>
+                        {isSuccess ? (
+                          <Alert color="success" style={{ marginTop: "20px" }}>
+                            User updated successflly.
+                          </Alert>
+                        ) : null}
+                        {isFailed ? (
+                          <Alert color="danger" style={{ marginTop: "20px" }}>
+                            Failed updating a match.
+                          </Alert>
+                        ) : null}
+                      </div>
+                    </Modal>
                   </Card>
                 </Col>
               </Row>
