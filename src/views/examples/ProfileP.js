@@ -52,10 +52,11 @@ export default function Profile() {
   const [fullNameFocus, setFullNameFocus] = React.useState(false);
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
+  const [confirmPasswordFocus, setConfirmPasswordFocus] = React.useState(false);
   const [formModal, setFormModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSuccess, setIsSuccess] = React.useState(false);
-
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const [isFailed, setIsFiled] = React.useState(false);
 
   const [userData, setUserData] = React.useState({
@@ -88,19 +89,25 @@ export default function Profile() {
   };
 
   const updateUser = () => {
-    axios
-      .patch("https://careful-elk-petticoat.cyclic.app/api/users/", userData)
-      .then((res) => {
-        console.log("response: ", res);
-        setIsSuccess(true);
-        setIsFiled(false);
-        fetchProfile();
-      })
-      .catch((err) => {
-        console.log("error: ", err);
-        setIsSuccess(false);
-        setIsFiled(true);
-      })();
+    if (userData.password === confirmPassword && userData.password !== null) {
+      axios
+        .patch("https://careful-elk-petticoat.cyclic.app/api/users/", userData)
+        .then(
+          (res) => {
+            console.log("response: ", res);
+            setIsSuccess(true);
+            setIsFiled(false);
+            fetchProfile();
+          },
+          (err) => {
+            console.log("error: ", err);
+            setIsSuccess(false);
+            setIsFiled(true);
+          }
+        );
+    } else {
+      ///yousif come here
+    }
   };
 
   React.useEffect(() => {
@@ -347,6 +354,27 @@ export default function Profile() {
                             />
                           </InputGroup>
                           <InputGroup>
+                            <InputGroup
+                              className={classnames({
+                                "input-group-focus": confirmPasswordFocus,
+                              })}
+                            >
+                              <InputGroupAddon addonType="prepend">
+                                <InputGroupText></InputGroupText>
+                              </InputGroupAddon>
+                              <Input
+                                placeholder="Confirm Password"
+                                name="confirmPassword"
+                                onChange={(e) => {
+                                  setConfirmPassword(e.target.value);
+                                }}
+                                type="password"
+                                onFocus={(e) => setConfirmPasswordFocus(true)}
+                                onBlur={(e) => setConfirmPasswordFocus(false)}
+                                required
+                              />
+                            </InputGroup>
+                            <InputGroup></InputGroup>
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText></InputGroupText>
                             </InputGroupAddon>
