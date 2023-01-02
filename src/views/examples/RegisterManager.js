@@ -46,7 +46,7 @@ import {
 import axios from "axios";
 // const axios = require("axios").default;
 
-export default function RegisterPage() {
+export default function RegisterManagerPage() {
   const [userData, setUserData] = React.useState({
     user_name: "",
     fname: "",
@@ -56,7 +56,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     nationality: "",
-    role: "fan",
+    role: "manager",
   });
   const [isRegisterSuccess, setIsRegisterSuccess] = React.useState(false);
 
@@ -160,8 +160,11 @@ export default function RegisterPage() {
                         alt="..."
                         src={require("assets/img/square-purple-1.png")}
                       />
-                      <CardTitle tag="h4" style={{ color: "white" }}>
-                        Register
+                      <CardTitle
+                        tag="h4"
+                        style={{ color: "white", fontSize: "50px" }}
+                      >
+                        Register <br /> as a manager
                       </CardTitle>
                     </CardHeader>
                     <CardBody>
@@ -309,19 +312,6 @@ export default function RegisterPage() {
                             }}
                           >
                             Login!
-                          </a>
-                        </Label>
-                      </FormGroup>
-                      <FormGroup className="text-left">
-                        <Label>
-                          Are you registering as a manager?{" "}
-                          <a
-                            href="#pablo"
-                            onClick={() => {
-                              window.location.href = "/register-manager";
-                            }}
-                          >
-                            Click Here!
                           </a>
                         </Label>
                       </FormGroup>

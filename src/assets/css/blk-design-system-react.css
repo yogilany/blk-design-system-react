@@ -15822,7 +15822,7 @@ img {
   background-color: #ff8d72 !important;
 }
 .navbar.bg-info {
-  background-color: #1d8cf8 !important;
+  background-color: #00a685 !important;
 }
 .navbar.bg-success {
   background-color: #00bf9a !important;
@@ -24055,7 +24055,7 @@ td.rdtYear:hover {
 }
 
 .index-page .squares {
-  background: #3358f4;
+  background: red;
   background: -webkit-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
   background: -o-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
   background: -moz-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);

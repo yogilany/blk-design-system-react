@@ -33,7 +33,7 @@ import {
   Container,
   Row,
   Col,
-  UncontrolledTooltip
+  UncontrolledTooltip,
 } from "reactstrap";
 
 export default function IndexNavbar() {
@@ -79,11 +79,11 @@ export default function IndexNavbar() {
       <Container>
         <div className="navbar-translate">
           <NavbarBrand to="/" tag={Link} id="navbar-brand">
-            <span>BLK• </span>
-            Design System React
+            <span>FIFA </span>
+            World Cup Qata 2022
           </NavbarBrand>
           <UncontrolledTooltip placement="bottom" target="navbar-brand">
-            Designed and Coded by Creative Tim
+            Designed and Coded by Gilany
           </UncontrolledTooltip>
           <button
             aria-expanded={collapseOpen}
@@ -121,41 +121,15 @@ export default function IndexNavbar() {
             </Row>
           </div>
           <Nav navbar>
-            <NavItem className="p-0">
-              <NavLink
-                data-placement="bottom"
-                href="https://twitter.com/CreativeTim"
-                rel="noopener noreferrer"
-                target="_blank"
-                title="Follow us on Twitter"
-              >
-                <i className="fab fa-twitter" />
-                <p className="d-lg-none d-xl-none">Twitter</p>
-              </NavLink>
-            </NavItem>
-            <NavItem className="p-0">
-              <NavLink
-                data-placement="bottom"
-                href="https://www.facebook.com/CreativeTim"
-                rel="noopener noreferrer"
-                target="_blank"
-                title="Like us on Facebook"
-              >
-                <i className="fab fa-facebook-square" />
-                <p className="d-lg-none d-xl-none">Facebook</p>
-              </NavLink>
-            </NavItem>
-            <NavItem className="p-0">
-              <NavLink
-                data-placement="bottom"
-                href="https://www.instagram.com/CreativeTimOfficial"
-                rel="noopener noreferrer"
-                target="_blank"
-                title="Follow us on Instagram"
-              >
-                <i className="fab fa-instagram" />
-                <p className="d-lg-none d-xl-none">Instagram</p>
-              </NavLink>
+            <NavItem>
+              <Link to="/">
+                <Button
+                  className="nav-link d-none d-lg-block"
+                  color="secondary"
+                >
+                  Home
+                </Button>
+              </Link>
             </NavItem>
             <UncontrolledDropdown nav>
               <DropdownToggle
@@ -167,45 +141,45 @@ export default function IndexNavbar() {
                 onClick={(e) => e.preventDefault()}
               >
                 <i className="fa fa-cogs d-lg-none d-xl-none" />
-                Getting started
+                Menu
               </DropdownToggle>
               <DropdownMenu className="dropdown-with-icons">
-                <DropdownItem href="https://demos.creative-tim.com/blk-design-system-react/#/documentation/overview">
+                {/* <DropdownItem href="https://demos.creative-tim.com/blk-design-system-react/#/documentation/overview">
                   <i className="tim-icons icon-paper" />
                   Documentation
-                </DropdownItem>
-                <DropdownItem tag={Link} to="/register-page">
+                </DropdownItem> */}
+                <DropdownItem tag={Link} to="/add-match-page">
                   <i className="tim-icons icon-bullet-list-67" />
-                  Register Page
+                  Add a match
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/add-stadium-page">
+                  <i className="tim-icons icon-bullet-list-67" />
+                  Add a stadium
                 </DropdownItem>
                 <DropdownItem tag={Link} to="/landing-page">
                   <i className="tim-icons icon-image-02" />
-                  Landing Page
+                  Matches
                 </DropdownItem>
-                <DropdownItem tag={Link} to="/profile-page">
-                  <i className="tim-icons icon-single-02" />
-                  Profile Page
+                <DropdownItem tag={Link} to="/stadiums-page">
+                  <i className="tim-icons icon-image-02" />
+                  Stadiums
+                </DropdownItem>
+                <DropdownItem tag={Link} to="/reservations">
+                  <i className="tim-icons icon-image-02" />
+                  Reservations
                 </DropdownItem>
               </DropdownMenu>
             </UncontrolledDropdown>
+
             <NavItem>
-              <Button
-                className="nav-link d-none d-lg-block"
-                color="primary"
-                target="_blank"
-                href="https://www.creative-tim.com/product/blk-design-system-pro-react?ref=bdsr-user-archive-index-navbar-upgrade-pro"
-              >
-                <i className="tim-icons icon-spaceship" /> Upgrade to PRO
-              </Button>
+              <NavLink tag={Link} to="/profile-page">
+                My Profile
+              </NavLink>
             </NavItem>
             <NavItem>
-              <Button
-                className="nav-link d-none d-lg-block"
-                color="default"
-                onClick={scrollToDownload}
-              >
-                <i className="tim-icons icon-cloud-download-93" /> Download
-              </Button>
+              <NavLink tag={Link} to="/register-page">
+                Log out
+              </NavLink>
             </NavItem>
           </Nav>
         </Collapse>

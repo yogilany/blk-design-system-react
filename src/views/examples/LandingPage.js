@@ -15,9 +15,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useMemo } from "react";
+import classnames from "classnames";
+
 // react plugin used to create charts
-import { Line } from "react-chartjs-2";
 // reactstrap components
 import {
   Button,
@@ -30,17 +31,278 @@ import {
   ListGroup,
   Container,
   Row,
-  Col
+  Col,
+  Table,
+  Dropdown,
+  Form,
+  FormGroup,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Input,
+  Modal,
+  Label,
+  UncontrolledTooltip,
+  UncontrolledPopover,
+  PopoverHeader,
+  PopoverBody,
+  Alert,
 } from "reactstrap";
 
 // core components
 import ExamplesNavbar from "components/Navbars/ExamplesNavbar.js";
 import Footer from "components/Footer/Footer.js";
 
-import bigChartData from "variables/charts.js";
+import { useTable } from "react-table";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { USER_ROLE } from "./LoginPage";
+import dayjs from "dayjs";
 
 export default function LandingPage() {
+  const [formModal, setFormModal] = React.useState(false);
+  const [formDeleteModal, setFormDeleteModal] = React.useState(false);
+  const [matches, setMatches] = React.useState([]);
+
+  const [userRole, setUserRole] = React.useState("manager");
+
+  const [team1Focus, setTeam1Focus] = React.useState(false);
+  const [team2Focus, setTeam2Focus] = React.useState(false);
+  const [dateFocus, setDateFocus] = React.useState(false);
+  const [timeFocus, setTimeFocus] = React.useState(false);
+
+  const [stadiumFocus, setStadiumFocus] = React.useState(false);
+  const [refereeFocus, setRefereeFocus] = React.useState(false);
+  const [lineman1Focus, setLineman1Focus] = React.useState(false);
+  const [lineman2Focus, setLineman2Focus] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+  const [isFailed, setIsFiled] = React.useState(false);
+  const [isSuccess2, setIsSuccess2] = React.useState(false);
+
+  const [isFailed2, setIsFiled2] = React.useState(false);
+  const [selectedMatch, setSelectedMatch] = React.useState({});
+
+  const [refs, setRefs] = React.useState([]);
+  const [teams, setteams] = React.useState([]);
+  const [venues, setVenues] = React.useState([]);
+
+  const [formData, updateFormData] = React.useState({
+    t1: 1,
+    t2: 2,
+    venue: 1,
+    ref: 1,
+    lineman1: 2,
+    lineman2: 3,
+    date: "2-2-2011",
+    time: "14:00:00",
+    id: 1,
+  });
+
+  const handleChange = (e) => {
+    // const dd = new Date("2015-03-04T00:00:00.000Z");
+    // const newDate = dd.getFullYear() + "-" + dd.getMonth() + "-" + dd.getDay();
+
+    if (e.target.name == "date" || e.target.name == "time") {
+      updateFormData({
+        ...formData,
+
+        // Trimming any whitespace
+        [e.target.name]: e.target.value,
+      });
+    } else {
+      updateFormData({
+        ...formData,
+
+        // Trimming any whitespace
+        [e.target.name]: parseInt(e.target.value),
+      });
+    }
+
+    console.log("change", formData);
+  };
+
+  const fetchMatches = async () => {
+    const r = await axios
+      .get("https://world-cup-backend-g3yn.onrender.com/api/match")
+      .then((res) => {
+        setMatches(res.data.data);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const data = React.useMemo(() => [...matches], [matches]);
+
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Home Team",
+        accessor: "t1", // accessor is the "key" in the data
+      },
+      {
+        Header: "Away Team",
+        accessor: "t2",
+      },
+      {
+        Header: "Stadium",
+        accessor: "stadium",
+      },
+      {
+        Header: "Date",
+        accessor: "date",
+      },
+      {
+        Header: "Time",
+        accessor: "time",
+      },
+      {
+        Cell: (data) => {
+          const { row } = data;
+          const { original } = row;
+
+          return (
+            <>
+              {userRole == "manager" ? (
+                <Button
+                  color="info"
+                  size="sm"
+                  onClick={() => setFormModal(true)}
+                >
+                  Edit
+                </Button>
+              ) : (
+                <Link to="/reservation-page" state={{ original }}>
+                  <Button
+                    color="info"
+                    size="sm"
+                    onClick={() => console.log(original)}
+                  >
+                    Reservee
+                  </Button>
+                </Link>
+              )}
+            </>
+          );
+        },
+        // Header: `Actions`,
+        accessor: (data) => ({ id: data.id }),
+        id: `Details`,
+      },
+      {
+        Cell: (data) => {
+          const { row } = data;
+          const { original } = row;
+
+          return (
+            <>
+              {userRole == "manager" ? (
+                <Button
+                  color="danger"
+                  size="sm"
+                  onClick={() => setFormDeleteModal(true)}
+                >
+                  Delete
+                </Button>
+              ) : null}
+            </>
+          );
+        },
+        // Header: `Delete`,
+        accessor: (data) => ({ id: data.id }),
+        id: `delete`,
+      },
+    ],
+    []
+  );
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+    useTable({ columns, data });
+
+  const fetchRefs = async () => {
+    const r = await axios
+      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/refs")
+      .then((res) => {
+        setRefs(res.data.data.seats);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const fetchTeams = async () => {
+    const r = await axios
+      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/teams/")
+      .then((res) => {
+        setteams(res.data.data.seats);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const fetchVenues = async () => {
+    const r = await axios
+      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/")
+      .then((res) => {
+        setVenues(res.data.data.venues);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const DeleterRequest = (e) => {
+    console.log("dlttt", e);
+    axios
+      .delete(`https://careful-elk-petticoat.cyclic.app/api/match/${e}/`)
+      .then((res) => {
+        console.log("response: ", res);
+        setIsSuccess2(true);
+        setIsFiled2(false);
+        fetchMatches();
+      })
+      .catch((err) => {
+        console.log("error: ", err);
+        setIsSuccess2(false);
+        setIsFiled2(true);
+      })();
+  };
+
+  const updateMatch = () => {
+    axios
+      .patch("https://world-cup-backend-g3yn.onrender.com/api/match/", {
+        team1: formData.team1,
+        team2: formData.team2,
+        venue: formData.venue,
+        referee: formData.referee,
+        lineman1: formData.lineman1,
+        lineman2: formData.lineman2,
+        date: formData.date,
+        time: formData.time,
+        id: selectedMatch.id,
+      })
+      .then((res) => {
+        console.log("response: ", res);
+        setIsSuccess(true);
+        setIsFiled(false);
+        fetchMatches();
+      })
+      .catch((err) => {
+        console.log("error: ", err);
+        setIsSuccess(false);
+        setIsFiled(true);
+      })();
+  };
+
   React.useEffect(() => {
+    fetchMatches();
+    fetchRefs();
+    fetchTeams();
+    fetchVenues();
     document.body.classList.toggle("landing-page");
     // Specify how to clean up after this effect:
     return function cleanup() {
@@ -50,540 +312,517 @@ export default function LandingPage() {
   return (
     <>
       <ExamplesNavbar />
-      <div className="wrapper">
-        <div className="page-header">
-          <img
-            alt="..."
-            className="path"
-            src={require("assets/img/blob.png")}
-          />
-          <img
-            alt="..."
-            className="path2"
-            src={require("assets/img/path2.png")}
-          />
-          <img
-            alt="..."
-            className="shapes triangle"
-            src={require("assets/img/triunghiuri.png")}
-          />
-          <img
-            alt="..."
-            className="shapes wave"
-            src={require("assets/img/waves.png")}
-          />
-          <img
-            alt="..."
-            className="shapes squares"
-            src={require("assets/img/patrat.png")}
-          />
-          <img
-            alt="..."
-            className="shapes circle"
-            src={require("assets/img/cercuri.png")}
-          />
-          <div className="content-center">
-            <Row className="row-grid justify-content-between align-items-center text-left">
-              <Col lg="6" md="6">
-                <h1 className="text-white">
-                  We keep your coin <br />
-                  <span className="text-white">secured</span>
-                </h1>
-                <p className="text-white mb-3">
-                  A wonderful serenity has taken possession of my entire soul,
-                  like these sweet mornings of spring which I enjoy with my
-                  whole heart. I am alone, and feel...
-                </p>
-                <div className="btn-wrapper mb-3">
-                  <p className="category text-success d-inline">
-                    From 9.99%/mo
-                  </p>
-                  <Button
-                    className="btn-link"
-                    color="success"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
-                    size="sm"
-                  >
-                    <i className="tim-icons icon-minimal-right" />
-                  </Button>
-                </div>
-                <div className="btn-wrapper">
-                  <div className="button-container">
-                    <Button
-                      className="btn-icon btn-simple btn-round btn-neutral"
-                      color="default"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <i className="fab fa-twitter" />
-                    </Button>
-                    <Button
-                      className="btn-icon btn-simple btn-round btn-neutral"
-                      color="default"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <i className="fab fa-dribbble" />
-                    </Button>
-                    <Button
-                      className="btn-icon btn-simple btn-round btn-neutral"
-                      color="default"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      <i className="fab fa-facebook" />
-                    </Button>
-                  </div>
-                </div>
-              </Col>
-              <Col lg="4" md="5">
-                <img
-                  alt="..."
-                  className="img-fluid"
-                  src={require("assets/img/etherum.png")}
-                />
-              </Col>
-            </Row>
+      <div className="content-center brand" style={{ width: "100%" }}>
+        <Container style={{ marginTop: "200px" }}>
+          <div>
+            <h1
+              style={{
+                position: "relative",
+                fontSize: "5em",
+                fontWeight: "900",
+                color: "white",
+                textTransform: "lowercase",
+                marginLeft: "-5px",
+                zIndex: "1",
+                fontFamily: "Qatar2022Arabic-Bold",
+                textAlign: "center",
+              }}
+            >
+              Matches
+            </h1>
           </div>
-        </div>
-        <section className="section section-lg">
-          <section className="section">
-            <img
-              alt="..."
-              className="path"
-              src={require("assets/img/path4.png")}
-            />
+          {isSuccess2 ? (
+            <Alert color="success" style={{ marginTop: "20px" }}>
+              Match has been deleted successflly.
+            </Alert>
+          ) : null}
+          {isFailed2 ? (
+            <Alert color="danger" style={{ marginTop: "20px" }}>
+              Failed deleting the match.
+            </Alert>
+          ) : null}
+          {!isLoading ? (
             <Container>
-              <Row className="row-grid justify-content-between">
-                <Col className="mt-lg-5" md="5">
-                  <Row>
-                    <Col className="px-2 py-2" lg="6" sm="12">
-                      <Card className="card-stats">
-                        <CardBody>
-                          <Row>
-                            <Col md="4" xs="5">
-                              <div className="icon-big text-center icon-warning">
-                                <i className="tim-icons icon-trophy text-warning" />
-                              </div>
-                            </Col>
-                            <Col md="8" xs="7">
-                              <div className="numbers">
-                                <CardTitle tag="p">3,237</CardTitle>
-                                <p />
-                                <p className="card-category">Awards</p>
-                              </div>
-                            </Col>
-                          </Row>
-                        </CardBody>
-                      </Card>
-                    </Col>
-                    <Col className="px-2 py-2" lg="6" sm="12">
-                      <Card className="card-stats upper bg-default">
-                        <CardBody>
-                          <Row>
-                            <Col md="4" xs="5">
-                              <div className="icon-big text-center icon-warning">
-                                <i className="tim-icons icon-coins text-white" />
-                              </div>
-                            </Col>
-                            <Col md="8" xs="7">
-                              <div className="numbers">
-                                <CardTitle tag="p">3,653</CardTitle>
-                                <p />
-                                <p className="card-category">Commits</p>
-                              </div>
-                            </Col>
-                          </Row>
-                        </CardBody>
-                      </Card>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="px-2 py-2" lg="6" sm="12">
-                      <Card className="card-stats">
-                        <CardBody>
-                          <Row>
-                            <Col md="4" xs="5">
-                              <div className="icon-big text-center icon-warning">
-                                <i className="tim-icons icon-gift-2 text-info" />
-                              </div>
-                            </Col>
-                            <Col md="8" xs="7">
-                              <div className="numbers">
-                                <CardTitle tag="p">593</CardTitle>
-                                <p />
-                                <p className="card-category">Presents</p>
-                              </div>
-                            </Col>
-                          </Row>
-                        </CardBody>
-                      </Card>
-                    </Col>
-                    <Col className="px-2 py-2" lg="6" sm="12">
-                      <Card className="card-stats">
-                        <CardBody>
-                          <Row>
-                            <Col md="4" xs="5">
-                              <div className="icon-big text-center icon-warning">
-                                <i className="tim-icons icon-credit-card text-success" />
-                              </div>
-                            </Col>
-                            <Col md="8" xs="7">
-                              <div className="numbers">
-                                <CardTitle tag="p">10,783</CardTitle>
-                                <p />
-                                <p className="card-category">Forks</p>
-                              </div>
-                            </Col>
-                          </Row>
-                        </CardBody>
-                      </Card>
-                    </Col>
-                  </Row>
-                </Col>
-                <Col md="6">
-                  <div className="pl-md-5">
-                    <h1>
-                      Large <br />
-                      Achivements
-                    </h1>
-                    <p>
-                      I should be capable of drawing a single stroke at the
-                      present moment; and yet I feel that I never was a greater
-                      artist than now.
-                    </p>
-                    <br />
-                    <p>
-                      When, while the lovely valley teems with vapour around me,
-                      and the meridian sun strikes the upper surface of the
-                      impenetrable foliage of my trees, and but a few stray.
-                    </p>
-                    <br />
-                    <a
-                      className="font-weight-bold text-info mt-5"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      Show all{" "}
-                      <i className="tim-icons icon-minimal-right text-info" />
-                    </a>
-                  </div>
-                </Col>
-              </Row>
+              {data.map((match, index) => {
+                return (
+                  <Card key={index} style={{ textAlign: "center" }}>
+                    <CardHeader></CardHeader>
+                    <CardBody>
+                      <Container>
+                        <Row className="justify-content-md-center">
+                          <Col md="auto">
+                            <img
+                              alt="..."
+                              className="img-fluid rounded-circle shadow"
+                              src={require("assets/img/james.jpg")}
+                              style={{ width: "150px", height: "150px" }}
+                            />
+                            <h4
+                              style={{
+                                textTransform: "uppercase",
+                                fontWeight: "600",
+                                marginTop: "10px",
+                              }}
+                            >
+                              {match.t1}
+                            </h4>
+                          </Col>
+                          <Col md="auto">
+                            <img
+                              alt="..."
+                              className="img-fluid rounded-circle shadow"
+                              src={require("assets/img/james.jpg")}
+                              style={{ width: "150px", height: "150px" }}
+                            />
+                            <h4
+                              style={{
+                                textTransform: "uppercase",
+                                fontWeight: "600",
+                                marginTop: "10px",
+                              }}
+                            >
+                              {match.t2}
+                            </h4>
+                          </Col>
+                          <Col style={{ marginLeft: "50px" }}>
+                            <ul className="list-unstyled mt-5">
+                              <li className="py-2">
+                                <div className="d-flex align-items-center">
+                                  <div className="icon icon-success mb-2">
+                                    <i className="tim-icons icon-vector" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <h6>{match.venue_name}</h6>
+                                  </div>
+                                </div>
+                              </li>
+                              <li className="py-2">
+                                <div className="d-flex align-items-center">
+                                  <div className="icon icon-success mb-2">
+                                    <i className="tim-icons icon-tap-02" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <h6>
+                                      {dayjs(match.date).format("YYYY-MM-DD")}
+                                    </h6>
+                                  </div>
+                                </div>
+                              </li>
+                              <li className="py-2">
+                                <div className="d-flex align-items-center">
+                                  <div className="icon icon-success mb-2">
+                                    <i className="tim-icons icon-single-02" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <h6>{match.time}</h6>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </Col>
+                          <Col>
+                            <ul className="list-unstyled mt-5">
+                              <li className="py-2">
+                                <div className="d-flex align-items-center">
+                                  <div className="icon icon-success mb-2">
+                                    <i className="tim-icons icon-vector" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <h6>{match.ref}</h6>
+                                  </div>
+                                </div>
+                              </li>
+                              <li className="py-2">
+                                <div className="d-flex align-items-center">
+                                  <div className="icon icon-success mb-2">
+                                    <i className="tim-icons icon-tap-02" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <h6>{match.lineman1}</h6>
+                                  </div>
+                                </div>
+                              </li>
+                              <li className="py-2">
+                                <div className="d-flex align-items-center">
+                                  <div className="icon icon-success mb-2">
+                                    <i className="tim-icons icon-single-02" />
+                                  </div>
+                                  <div className="ml-3">
+                                    <h6>{match.lineman2}</h6>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </Col>
+                          <Col md="auto" style={{ marginTop: "auto" }}>
+                            {USER_ROLE === "fan" ? (
+                              <Link
+                                to={`/reservation-page?matchId=${match.id}`}
+                              >
+                                <Button color="primary">Reserve</Button>
+                              </Link>
+                            ) : null}
+                            {USER_ROLE === "manager" ? (
+                              <>
+                                <Button
+                                  color="info"
+                                  onClick={() => {
+                                    console.log("match is", match);
+                                    setSelectedMatch(match);
+
+                                    setFormModal(true);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  color="danger"
+                                  onClick={() => {
+                                    setSelectedMatch(match);
+
+                                    setFormDeleteModal(true);
+                                  }}
+                                >
+                                  Delete
+                                </Button>
+                              </>
+                            ) : null}
+                          </Col>
+                        </Row>
+                      </Container>
+
+                      {/* <h2>
+                      {match.team1} Vs. {match.team2}
+                    </h2> */}
+                      {/* <div style={{ textAlign: "center" }}>
+                      <div className="align-items-center">
+                        <div className="ml-3">
+                          <h6>{match.stadium}</h6>
+                        </div>
+                      </div>
+                    </div> */}
+                    </CardBody>
+                  </Card>
+                );
+              })}
             </Container>
-          </section>
-        </section>
-        <section className="section section-lg">
-          <img
-            alt="..."
-            className="path"
-            src={require("assets/img/path4.png")}
-          />
-          <img
-            alt="..."
-            className="path2"
-            src={require("assets/img/path5.png")}
-          />
-          <img
-            alt="..."
-            className="path3"
-            src={require("assets/img/path2.png")}
-          />
-          <Container>
-            <Row className="justify-content-center">
-              <Col lg="12">
-                <h1 className="text-center">Your best benefit</h1>
-                <Row className="row-grid justify-content-center">
-                  <Col lg="3">
-                    <div className="info">
-                      <div className="icon icon-primary">
-                        <i className="tim-icons icon-money-coins" />
-                      </div>
-                      <h4 className="info-title">Low Commission</h4>
-                      <hr className="line-primary" />
-                      <p>
-                        Divide details about your work into parts. Write a few
-                        lines about each one. A paragraph describing a feature
-                        will.
-                      </p>
-                    </div>
-                  </Col>
-                  <Col lg="3">
-                    <div className="info">
-                      <div className="icon icon-warning">
-                        <i className="tim-icons icon-chart-pie-36" />
-                      </div>
-                      <h4 className="info-title">High Incomes</h4>
-                      <hr className="line-warning" />
-                      <p>
-                        Divide details about your product or agency work into
-                        parts. Write a few lines about each one. A paragraph
-                        describing feature will be a feature.
-                      </p>
-                    </div>
-                  </Col>
-                  <Col lg="3">
-                    <div className="info">
-                      <div className="icon icon-success">
-                        <i className="tim-icons icon-single-02" />
-                      </div>
-                      <h4 className="info-title">Verified People</h4>
-                      <hr className="line-success" />
-                      <p>
-                        Divide details about your product or agency work into
-                        parts. Write a few lines about each one. A paragraph
-                        describing be enough.
-                      </p>
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </Container>
-        </section>
-        <section className="section section-lg section-safe">
-          <img
-            alt="..."
-            className="path"
-            src={require("assets/img/path5.png")}
-          />
-          <Container>
-            <Row className="row-grid justify-content-between">
-              <Col md="5">
-                <img
-                  alt="..."
-                  className="img-fluid floating"
-                  src={require("assets/img/chester-wade.jpg")}
-                />
-                <Card className="card-stats bg-danger">
-                  <CardBody>
-                    <div className="justify-content-center">
-                      <div className="numbers">
-                        <CardTitle tag="p">100%</CardTitle>
-                        <p className="card-category text-white">Safe</p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card className="card-stats bg-info">
-                  <CardBody>
-                    <div className="justify-content-center">
-                      <div className="numbers">
-                        <CardTitle tag="p">573 K</CardTitle>
-                        <p className="card-category text-white">
-                          Satisfied customers
-                        </p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-                <Card className="card-stats bg-default">
-                  <CardBody>
-                    <div className="justify-content-center">
-                      <div className="numbers">
-                        <CardTitle tag="p">10 425</CardTitle>
-                        <p className="card-category text-white">Business</p>
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
-              <Col md="6">
-                <div className="px-md-5">
-                  <hr className="line-success" />
-                  <h3>Awesome features</h3>
-                  <p>
-                    The design system comes with three pre-built pages to help
-                    you get started faster. You can change the text and images
-                    and you're good to go.
-                  </p>
-                  <ul className="list-unstyled mt-5">
-                    <li className="py-2">
-                      <div className="d-flex align-items-center">
-                        <div className="icon icon-success mb-2">
-                          <i className="tim-icons icon-vector" />
-                        </div>
-                        <div className="ml-3">
-                          <h6>Carefully crafted components</h6>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="d-flex align-items-center">
-                        <div className="icon icon-success mb-2">
-                          <i className="tim-icons icon-tap-02" />
-                        </div>
-                        <div className="ml-3">
-                          <h6>Amazing page examples</h6>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="py-2">
-                      <div className="d-flex align-items-center">
-                        <div className="icon icon-success mb-2">
-                          <i className="tim-icons icon-single-02" />
-                        </div>
-                        <div className="ml-3">
-                          <h6>Super friendly support team</h6>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
+          ) : (
+            <h1>Loading</h1>
+          )}
+
+          <Modal
+            modalClassName="modal-black"
+            isOpen={formModal}
+            toggle={() => setFormModal(false)}
+          >
+            <div className="modal-header justify-content-center">
+              <button className="close" onClick={() => setFormModal(false)}>
+                <i className="tim-icons icon-simple-remove text-white" />
+              </button>
+              <div className="text-muted text-center ml-auto mr-auto">
+                <h3 className="mb-0">Edit match details</h3>
+              </div>
+            </div>
+            <div className="modal-body">
+              <Form className="form">
+                <div className="form-row">
+                  <FormGroup className="col-md-6">
+                    <Label style={{ fontSize: "10px" }}>Team 1</Label>
+
+                    <InputGroup
+                      className={classnames({
+                        "input-group-focus": team1Focus,
+                      })}
+                    >
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          {/* <i className="tim-icons icon-lock-circle" /> */}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        name="t1"
+                        type="select"
+                        onFocus={(e) => setTeam1Focus(true)}
+                        onBlur={(e) => setTeam1Focus(false)}
+                        onChange={handleChange}
+                      >
+                        <option disabled value={selectedMatch.t1} selected>
+                          {selectedMatch.t1}
+                        </option>
+                        {teams.map((team) => {
+                          return (
+                            <option value={team.id}>{team.team_name}</option>
+                          );
+                        })}
+                      </Input>
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup className="col-md-6">
+                    <Label style={{ fontSize: "10px" }}>Team 2</Label>
+
+                    <InputGroup
+                      className={classnames({
+                        "input-group-focus": team2Focus,
+                      })}
+                    >
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          {/* <i className="tim-icons icon-single-02" /> */}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        name="t2"
+                        type="select"
+                        onFocus={(e) => setTeam2Focus(true)}
+                        onBlur={(e) => setTeam2Focus(false)}
+                        onChange={handleChange}
+                      >
+                        <option disabled value={selectedMatch.t2} selected>
+                          {selectedMatch.t2}
+                        </option>
+                        {teams.map((team) => {
+                          return (
+                            <option value={team.id}>{team.team_name}</option>
+                          );
+                        })}
+                      </Input>
+                    </InputGroup>
+                  </FormGroup>
                 </div>
-              </Col>
-            </Row>
-          </Container>
-        </section>
-        <section className="section section-lg">
-          <img
-            alt="..."
-            className="path"
-            src={require("assets/img/path4.png")}
-          />
-          <img
-            alt="..."
-            className="path2"
-            src={require("assets/img/path2.png")}
-          />
-          <Col md="12">
-            <Card className="card-chart card-plain">
-              <CardHeader>
-                <Row>
-                  <Col className="text-left" sm="6">
-                    <hr className="line-info" />
-                    <h5 className="card-category">Total Investments</h5>
-                    <CardTitle tag="h2">Performance</CardTitle>
-                  </Col>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                <div className="chart-area">
-                  <Line
-                    data={bigChartData.data}
-                    options={bigChartData.options}
-                  />
+
+                <Label style={{ fontSize: "10px" }}>Stadium</Label>
+
+                <InputGroup
+                  className={classnames({
+                    "input-group-focus": stadiumFocus,
+                  })}
+                >
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      {/* <i className="tim-icons icon-email-85" /> */}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    name="venue"
+                    type="select"
+                    onFocus={(e) => setStadiumFocus(true)}
+                    onBlur={(e) => setStadiumFocus(false)}
+                    onChange={handleChange}
+                  >
+                    <option disabled value={selectedMatch.venue_name} selected>
+                      {selectedMatch.venue_name}
+                    </option>
+                    {venues.map((ven) => {
+                      return <option value={ven.id}>{ven.venue_name}</option>;
+                    })}
+                  </Input>
+                </InputGroup>
+
+                <div className="form-row">
+                  <FormGroup className="col-md-6">
+                    <Label style={{ fontSize: "10px" }}>Date</Label>
+
+                    <InputGroup
+                      className={classnames({
+                        "input-group-focus": dateFocus,
+                      })}
+                    >
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          {/* <i className="tim-icons icon-lock-circle" /> */}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        name="date"
+                        placeholder="Date"
+                        type="date"
+                        defaultValue={dayjs(selectedMatch.date).format(
+                          "YYYY-MM-DD"
+                        )}
+                        onFocus={(e) => setDateFocus(true)}
+                        onBlur={(e) => setDateFocus(false)}
+                        onChange={handleChange}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup className="col-md-6">
+                    <Label style={{ fontSize: "10px" }}>Time</Label>
+
+                    <InputGroup
+                      className={classnames({
+                        "input-group-focus": timeFocus,
+                      })}
+                    >
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          {/* <i className="tim-icons icon-lock-circle" /> */}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        name="time"
+                        placeholder="Time"
+                        type="time"
+                        value={selectedMatch.time}
+                        onFocus={(e) => setTimeFocus(true)}
+                        onBlur={(e) => setTimeFocus(false)}
+                        onChange={handleChange}
+                      />
+                    </InputGroup>
+                  </FormGroup>
                 </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </section>
-        <section className="section section-lg section-coins">
-          <img
-            alt="..."
-            className="path"
-            src={require("assets/img/path3.png")}
-          />
-          <Container>
-            <Row>
-              <Col md="4">
-                <hr className="line-info" />
-                <h1>
-                  Choose the coin{" "}
-                  <span className="text-info">that fits your needs</span>
-                </h1>
-              </Col>
-            </Row>
-            <Row>
-              <Col md="4">
-                <Card className="card-coin card-plain">
-                  <CardHeader>
-                    <img
-                      alt="..."
-                      className="img-center img-fluid"
-                      src={require("assets/img/bitcoin.png")}
-                    />
-                  </CardHeader>
-                  <CardBody>
-                    <Row>
-                      <Col className="text-center" md="12">
-                        <h4 className="text-uppercase">Light Coin</h4>
-                        <span>Plan</span>
-                        <hr className="line-primary" />
-                      </Col>
-                    </Row>
-                    <Row>
-                      <ListGroup>
-                        <ListGroupItem>50 messages</ListGroupItem>
-                        <ListGroupItem>100 emails</ListGroupItem>
-                        <ListGroupItem>24/7 Support</ListGroupItem>
-                      </ListGroup>
-                    </Row>
-                  </CardBody>
-                  <CardFooter className="text-center">
-                    <Button className="btn-simple" color="primary">
-                      Get plan
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Col>
-              <Col md="4">
-                <Card className="card-coin card-plain">
-                  <CardHeader>
-                    <img
-                      alt="..."
-                      className="img-center img-fluid"
-                      src={require("assets/img/etherum.png")}
-                    />
-                  </CardHeader>
-                  <CardBody>
-                    <Row>
-                      <Col className="text-center" md="12">
-                        <h4 className="text-uppercase">Dark Coin</h4>
-                        <span>Plan</span>
-                        <hr className="line-success" />
-                      </Col>
-                    </Row>
-                    <Row>
-                      <ListGroup>
-                        <ListGroupItem>150 messages</ListGroupItem>
-                        <ListGroupItem>1000 emails</ListGroupItem>
-                        <ListGroupItem>24/7 Support</ListGroupItem>
-                      </ListGroup>
-                    </Row>
-                  </CardBody>
-                  <CardFooter className="text-center">
-                    <Button className="btn-simple" color="success">
-                      Get plan
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Col>
-              <Col md="4">
-                <Card className="card-coin card-plain">
-                  <CardHeader>
-                    <img
-                      alt="..."
-                      className="img-center img-fluid"
-                      src={require("assets/img/ripp.png")}
-                    />
-                  </CardHeader>
-                  <CardBody>
-                    <Row>
-                      <Col className="text-center" md="12">
-                        <h4 className="text-uppercase">Bright Coin</h4>
-                        <span>Plan</span>
-                        <hr className="line-info" />
-                      </Col>
-                    </Row>
-                    <Row>
-                      <ListGroup>
-                        <ListGroupItem>350 messages</ListGroupItem>
-                        <ListGroupItem>10K emails</ListGroupItem>
-                        <ListGroupItem>24/7 Support</ListGroupItem>
-                      </ListGroup>
-                    </Row>
-                  </CardBody>
-                  <CardFooter className="text-center">
-                    <Button className="btn-simple" color="info">
-                      Get plan
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Col>
-            </Row>
-          </Container>
-        </section>
+
+                <Label style={{ fontSize: "10px" }}>Referee</Label>
+
+                <InputGroup
+                  className={classnames({
+                    "input-group-focus": refereeFocus,
+                  })}
+                >
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>
+                      {/* <i className="tim-icons icon-lock-circle" /> */}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    name="ref"
+                    type="select"
+                    onFocus={(e) => setRefereeFocus(true)}
+                    onBlur={(e) => setRefereeFocus(false)}
+                    onChange={handleChange}
+                  >
+                    <option disabled value={selectedMatch.ref} selected>
+                      {selectedMatch.ref}
+                    </option>
+                    {refs.map((ref) => {
+                      return <option value={ref.id}>{ref.name}</option>;
+                    })}
+                  </Input>
+                </InputGroup>
+
+                <div className="form-row">
+                  <FormGroup className="col-md-6">
+                    <Label style={{ fontSize: "10px" }}>Lineman 1</Label>
+
+                    <InputGroup
+                      className={classnames({
+                        "input-group-focus": lineman1Focus,
+                      })}
+                    >
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          {/* <i className="tim-icons icon-lock-circle" /> */}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        name="lineman1"
+                        type="select"
+                        onFocus={(e) => setLineman1Focus(true)}
+                        onBlur={(e) => setLineman1Focus(false)}
+                        onChange={handleChange}
+                      >
+                        <option
+                          disabled
+                          value={selectedMatch.lineman1}
+                          selected
+                        >
+                          {selectedMatch.lineman1}
+                        </option>
+                        {refs.map((ref) => {
+                          return <option value={ref.id}>{ref.name}</option>;
+                        })}
+                      </Input>
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup className="col-md-6">
+                    <Label style={{ fontSize: "10px" }}>Lineman 2</Label>
+
+                    <InputGroup
+                      className={classnames({
+                        "input-group-focus": lineman2Focus,
+                      })}
+                    >
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          {/* <i className="tim-icons icon-lock-circle" /> */}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        name="lineman2"
+                        type="select"
+                        onFocus={(e) => setLineman2Focus(true)}
+                        onBlur={(e) => setLineman2Focus(false)}
+                        onChange={handleChange}
+                      >
+                        <option
+                          disabled
+                          value={selectedMatch.lineman2}
+                          selected
+                        >
+                          {selectedMatch.lineman2}
+                        </option>
+                        {refs.map((ref) => {
+                          return <option value={ref.id}>{ref.name}</option>;
+                        })}
+                      </Input>
+                    </InputGroup>
+                  </FormGroup>
+                </div>
+              </Form>
+              <Button
+                className="btn-round"
+                color="primary"
+                size="md"
+                onClick={updateMatch}
+              >
+                Save
+              </Button>
+              {isSuccess ? (
+                <Alert color="success" style={{ marginTop: "20px" }}>
+                  Match updated successflly.
+                </Alert>
+              ) : null}
+              {isFailed ? (
+                <Alert color="danger" style={{ marginTop: "20px" }}>
+                  Failed updating a match.
+                </Alert>
+              ) : null}
+            </div>
+          </Modal>
+          <Modal
+            isOpen={formDeleteModal}
+            toggle={() => setFormDeleteModal(false)}
+          >
+            <div className="modal-header justify-content-center">
+              <button
+                className="close"
+                onClick={() => setFormDeleteModal(false)}
+              >
+                <i className="tim-icons icon-simple-remove" />
+              </button>
+              <h4 className="title title-up">Delete Match</h4>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure? You cannot undo this step.</p>
+            </div>
+            <div className="modal-footer">
+              <Button color="default" type="button">
+                Cancel
+              </Button>
+              <Button
+                color="danger"
+                type="button"
+                onClick={() => {
+                  setFormDeleteModal(false);
+
+                  DeleterRequest(selectedMatch.id);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </Modal>
+        </Container>
+
         <Footer />
       </div>
     </>

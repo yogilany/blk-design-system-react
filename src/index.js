@@ -27,26 +27,69 @@ import Index from "views/Index.js";
 import LandingPage from "views/examples/LandingPage.js";
 import RegisterPage from "views/examples/RegisterPage.js";
 import ProfilePage from "views/examples/ProfilePage.js";
+import AddMatchPage from "views/examples/AddMatch";
+import AddStadiumPage from "views/examples/AddStadium";
+import StadiumsPage from "views/examples/StadiumsPage";
+import ReserveMatch from "views/examples/ReserveMatch";
+import ReservationsPage from "views/examples/ReservationsPage";
+import Profile from "views/examples/ProfileP";
+import LoginPage from "views/examples/LoginPage";
+import RequestPage from "views/examples/RequestsPage";
+import NotFound from "views/examples/NotfoundPage";
+import { AuthProvider } from "auth/authProvider";
+import UsersPage from "views/examples/UsersPage";
+import RegisterManagerPage from "views/examples/RegisterManager";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Switch>
-      <Route path="/components" render={(props) => <Index {...props} />} />
-      <Route
-        path="/landing-page"
-        render={(props) => <LandingPage {...props} />}
-      />
-      <Route
-        path="/register-page"
-        render={(props) => <RegisterPage {...props} />}
-      />
-      <Route
-        path="/profile-page"
-        render={(props) => <ProfilePage {...props} />}
-      />
-      <Redirect from="/" to="/components" />
-    </Switch>
-  </BrowserRouter>
+  <AuthProvider>
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/" render={(props) => <Index {...props} />} />
+        <Route
+          path="/landing-page"
+          render={(props) => <LandingPage {...props} />}
+        />
+        <Route
+          path="/register-page"
+          render={(props) => <RegisterPage {...props} />}
+        />
+        <Route
+          path="/register-manager"
+          render={(props) => <RegisterManagerPage {...props} />}
+        />
+        <Route
+          path="/requests"
+          render={(props) => <RequestPage {...props} />}
+        />
+        <Route path="/users" render={(props) => <UsersPage {...props} />} />
+        <Route path="/login" render={(props) => <LoginPage {...props} />} />
+        <Route
+          path="/profile-page"
+          render={(props) => <Profile {...props} />}
+        />
+        <Route
+          path="/add-match-page"
+          render={(props) => <AddMatchPage {...props} />}
+        />
+        <Route
+          path="/add-stadium-page"
+          render={(props) => <AddStadiumPage {...props} />}
+        />
+        <Route
+          path="/stadiums-page"
+          render={(props) => <StadiumsPage {...props} />}
+        />
+        <Route
+          path="/reservation-page"
+          render={(props) => <ReserveMatch {...props} />}
+        />
+        <Route
+          path="/reservations"
+          render={(props) => <ReservationsPage {...props} />}
+        />
+      </Switch>
+    </BrowserRouter>
+  </AuthProvider>
 );

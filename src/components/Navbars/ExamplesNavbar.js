@@ -29,10 +29,18 @@ import {
   Container,
   Row,
   Col,
-  UncontrolledTooltip
+  UncontrolledTooltip,
+  DropdownMenu,
+  DropdownItem,
+  DropdownToggle,
+  UncontrolledDropdown,
 } from "reactstrap";
 
-export default function ExamplesNavbar() {
+import authHeader from "auth/localStorage";
+const loggedIn = authHeader();
+
+export default function ExamplesNavbar(props) {
+  console.log("ROLLLLEEE", loggedIn);
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   const [collapseOut, setCollapseOut] = React.useState("");
   const [color, setColor] = React.useState("navbar-transparent");
@@ -70,12 +78,10 @@ export default function ExamplesNavbar() {
       <Container>
         <div className="navbar-translate">
           <NavbarBrand to="/" id="navbar-brand" tag={Link}>
-            <span>BLK• </span>
-            Design System React
+            <span>FIFA• </span>
+            World Cup Qatar 2022
           </NavbarBrand>
-          <UncontrolledTooltip placement="bottom" target="navbar-brand">
-            Designed and Coded by Creative Tim
-          </UncontrolledTooltip>
+
           <button
             aria-expanded={collapseOpen}
             className="navbar-toggler navbar-toggler"
@@ -112,62 +118,91 @@ export default function ExamplesNavbar() {
             </Row>
           </div>
           <Nav navbar>
-            <NavItem className="p-0">
-              <NavLink
-                data-placement="bottom"
-                href="https://twitter.com/CreativeTim"
-                rel="noopener noreferrer"
-                target="_blank"
-                title="Follow us on Twitter"
-              >
-                <i className="fab fa-twitter" />
-                <p className="d-lg-none d-xl-none">Twitter</p>
-              </NavLink>
+            <NavItem>
+              <Link to="/">
+                <Button
+                  className="nav-link d-none d-lg-block"
+                  color="secondary"
+                >
+                  Home
+                </Button>
+              </Link>
             </NavItem>
-            <NavItem className="p-0">
-              <NavLink
-                data-placement="bottom"
-                href="https://www.facebook.com/CreativeTim"
-                rel="noopener noreferrer"
-                target="_blank"
-                title="Like us on Facebook"
+            <UncontrolledDropdown nav>
+              <DropdownToggle
+                caret
+                color="default"
+                data-toggle="dropdown"
+                href="#pablo"
+                nav
+                onClick={(e) => e.preventDefault()}
               >
-                <i className="fab fa-facebook-square" />
-                <p className="d-lg-none d-xl-none">Facebook</p>
-              </NavLink>
-            </NavItem>
-            <NavItem className="p-0">
-              <NavLink
-                data-placement="bottom"
-                href="https://www.instagram.com/CreativeTimOfficial"
-                rel="noopener noreferrer"
-                target="_blank"
-                title="Follow us on Instagram"
-              >
-                <i className="fab fa-instagram" />
-                <p className="d-lg-none d-xl-none">Instagram</p>
+                <i className="fa fa-cogs d-lg-none d-xl-none" />
+                Menu
+              </DropdownToggle>
+              <DropdownMenu className="dropdown-with-icons">
+                {/* <DropdownItem href="https://demos.creative-tim.com/blk-design-system-react/#/documentation/overview">
+                  <i className="tim-icons icon-paper" />
+                  Documentation
+                </DropdownItem> */}
+                {loggedIn === "manager" ? (
+                  <DropdownItem tag={Link} to="/add-match-page">
+                    <i className="tim-icons icon-bullet-list-67" />
+                    Add a match
+                  </DropdownItem>
+                ) : null}
+                {loggedIn === "manager" ? (
+                  <DropdownItem tag={Link} to="/add-stadium-page">
+                    <i className="tim-icons icon-bullet-list-67" />
+                    Add a stadium
+                  </DropdownItem>
+                ) : null}
+                <DropdownItem tag={Link} to="/landing-page">
+                  <i className="tim-icons icon-image-02" />
+                  Matches
+                </DropdownItem>
+                {loggedIn === "manager" ? (
+                  <DropdownItem tag={Link} to="/stadiums-page">
+                    <i className="tim-icons icon-image-02" />
+                    Stadiums
+                  </DropdownItem>
+                ) : null}
+                {loggedIn === "fan" ? (
+                  <DropdownItem tag={Link} to="/reservations">
+                    <i className="tim-icons icon-image-02" />
+                    My reservations
+                  </DropdownItem>
+                ) : null}
+                {loggedIn === "admin" ? (
+                  <DropdownItem tag={Link} to="/requests">
+                    <i className="tim-icons icon-image-02" />
+                    Requests
+                  </DropdownItem>
+                ) : null}
+                {loggedIn === "admin" ? (
+                  <DropdownItem tag={Link} to="/users">
+                    <i className="tim-icons icon-image-02" />
+                    Managers
+                  </DropdownItem>
+                ) : null}
+              </DropdownMenu>
+            </UncontrolledDropdown>
+
+            <NavItem>
+              <NavLink tag={Link} to="/profile-page">
+                My Profile
               </NavLink>
             </NavItem>
             <NavItem>
-              <Button
-                className="nav-link d-none d-lg-block"
-                color="primary"
-                target="_blank"
-                href="https://www.creative-tim.com/product/blk-design-system-pro-react?ref=bdsr-examples-navbar-upgrade-pro"
-              >
-                <i className="tim-icons icon-spaceship" /> Upgrade to PRO
-              </Button>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} to="/">
-                Back to Kit
+              <NavLink tag={Link} to="/login">
+                Log out
               </NavLink>
             </NavItem>
-            <NavItem>
+            {/* <NavItem>
               <NavLink href="https://github.com/creativetimofficial/blk-design-system-react/issues">
                 Have an issue?
               </NavLink>
-            </NavItem>
+            </NavItem> */}
           </Nav>
         </Collapse>
       </Container>

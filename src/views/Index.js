@@ -21,6 +21,8 @@ import React from "react";
 import IndexNavbar from "components/Navbars/IndexNavbar.js";
 import PageHeader from "components/PageHeader/PageHeader.js";
 import Footer from "components/Footer/Footer.js";
+import { Outlet, useLocation } from "react-router-dom";
+import ExamplesNavbar from "../components/Navbars/ExamplesNavbar";
 
 // sections for this page/view
 import Basics from "views/IndexSections/Basics.js";
@@ -35,8 +37,13 @@ import Signup from "views/IndexSections/Signup.js";
 import Examples from "views/IndexSections/Examples.js";
 import Download from "views/IndexSections/Download.js";
 
+import { USER_ROLE } from "./examples/LoginPage";
+
 export default function Index() {
+  const { pathname } = useLocation();
+
   React.useEffect(() => {
+    console.log("in index page", pathname);
     document.body.classList.toggle("index-page");
     // Specify how to clean up after this effect:
     return function cleanup() {
@@ -45,21 +52,22 @@ export default function Index() {
   }, []);
   return (
     <>
-      <IndexNavbar />
+      {/* <IndexNavbar /> */}
+      <ExamplesNavbar />
       <div className="wrapper">
         <PageHeader />
         <div className="main">
-          <Basics />
-          <Navbars />
+          {/* <Basics /> */}
+          {/* <Navbars />
           <Tabs />
           <Pagination />
           <Notifications />
           <Typography />
-          <JavaScript />
-          <NucleoIcons />
-          <Signup />
+          <JavaScript /> */}
+          {USER_ROLE != "admin" ? <NucleoIcons /> : null}
+          {/* <Signup />
           <Examples />
-          <Download />
+          <Download /> */}
         </div>
         <Footer />
       </div>

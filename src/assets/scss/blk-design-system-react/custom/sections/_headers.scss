@@ -1,24 +1,24 @@
-.page-header{
-    .carousel .carousel-indicators{
-        bottom: 60px;
-    }
+.page-header {
+  .carousel .carousel-indicators {
+    bottom: 60px;
+  }
 
-    .container{
-        color: $white;
-    }
+  .container {
+    color: $white;
+  }
 
-    .title{
-        color: $white;
-    }
+  .title {
+    color: $white;
+  }
 
-    &.header-small{
-        height: 65vh;
-        min-height: 65vh;
+  &.header-small {
+    height: 65vh;
+    min-height: 65vh;
 
-        .container{
-            padding-top: 20vh;
-        }
+    .container {
+      padding-top: 20vh;
     }
+  }
 }
 
 .landing-page {
@@ -29,60 +29,86 @@
   }
 }
 
-.header-filter{
+// .bg-opacity-trick {
+//   background-size: cover;
+//   background-repeat: no-repeat;
+// }
+
+#GFG {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#GFG::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+
+  /* Specify the background image to be used */
+  //   background-image: url("https://media.geeksforgeeks.org/wp-content/uploads/20210313130410/exbg.png");
+  background-size: cover;
+  background-image: url("../../../../img/fifa1.jpeg");
+
+  /* Specify the background image */
+  opacity: 0.2;
+}
+
+.header-filter {
+  position: relative;
+
+  .container {
+    z-index: 2;
     position: relative;
-
-    .container{
-        z-index: 2;
-        position: relative;
-    }
-
+  }
 }
-.clear-filter{
-    &:before{
-        display: none;
-    }
+.clear-filter {
+  &:before {
+    display: none;
+  }
 }
 
-.iframe-container iframe{
-    width: 100%;
-    box-shadow: 0px 10px 50px 0px rgba(0, 0, 0, 0.3);
+.iframe-container iframe {
+  width: 100%;
+  box-shadow: 0px 10px 50px 0px rgba(0, 0, 0, 0.3);
 }
 
 .header-1,
 .header-2,
-.header-3{
-    .wrapper{
-        background: #CCCCCC;
-    }
-    .content-center{
-        max-width: none !important;
-    }
+.header-3 {
+  .wrapper {
+    background: #cccccc;
+  }
+  .content-center {
+    max-width: none !important;
+  }
 }
 
 .header-2,
-.header-1{
-    .page-header{
-        .card{
-            margin-top: 60px;
-        }
+.header-1 {
+  .page-header {
+    .card {
+      margin-top: 60px;
     }
+  }
 }
 
-.header-3{
-    .btn{
-        margin: 0;
-    }
-    h6{
-        margin-bottom: 0;
-    }
+.header-3 {
+  .btn {
+    margin: 0;
+  }
+  h6 {
+    margin-bottom: 0;
+  }
 }
 
-
-@media screen and (max-width: 768px){
+@media screen and (max-width: 768px) {
   .page-header {
     .content-center {
-
       .row {
         text-align: center !important;
       }
@@ -93,7 +119,6 @@
     }
   }
 }
-.wrapper .navbar{
+.wrapper .navbar {
   z-index: 2;
-
 }
