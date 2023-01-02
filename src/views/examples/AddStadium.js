@@ -71,18 +71,24 @@ export default function AddStadiumPage() {
   };
 
   const postStadium = (e) => {
-    axios
-      .post("https://world-cup-backend-g3yn.onrender.com/api/venue/", formData)
-      .then((res) => {
-        console.log("response: ", res);
-        setIsSuccess(true);
-        setIsFiled(false);
-      })
-      .catch((err) => {
-        console.log("error: ", err);
-        setIsSuccess(false);
-        setIsFiled(true);
-      })();
+    if (parseInt(formData.maxcol) > 40) {
+      alert("number of columns should not exceed 40");
+    } else if (parseInt(formData.maxrow) > 40) {
+      alert("number of rows should not exceed 40");
+    } else {
+      axios
+        .post("https://careful-elk-petticoat.cyclic.app/api/venue/", formData)
+        .then((res) => {
+          console.log("response: ", res);
+          setIsSuccess(true);
+          setIsFiled(false);
+        })
+        .catch((err) => {
+          console.log("error: ", err);
+          setIsSuccess(false);
+          setIsFiled(true);
+        })();
+    }
   };
 
   React.useEffect(() => {

@@ -100,7 +100,7 @@ export default function AddMatchPage() {
 
   const fetchRefs = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/refs")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/refs")
       .then((res) => {
         console.log(res.data.data.seats);
         setRefs(res.data.data.seats);
@@ -112,7 +112,7 @@ export default function AddMatchPage() {
 
   const fetchTeams = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/teams/")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/teams/")
       .then((res) => {
         console.log(res.data.data.seats);
         setteams(res.data.data.seats);
@@ -124,7 +124,7 @@ export default function AddMatchPage() {
 
   const fetchVenues = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/")
       .then((res) => {
         console.log(res.data.data);
         setVenues(res.data.data.venues);
@@ -136,7 +136,7 @@ export default function AddMatchPage() {
 
   const postMatch = (e) => {
     axios
-      .post("https://world-cup-backend-g3yn.onrender.com/api/match/", formData)
+      .post("https://careful-elk-petticoat.cyclic.app/api/match/", formData)
       .then((res) => {
         console.log("response: ", res);
         setIsSuccess(true);

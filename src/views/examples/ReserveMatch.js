@@ -59,10 +59,14 @@ const initialFormData = Object.freeze({
   date: "",
 });
 
+var timeSec = new Date().getSeconds();
+
 export default function ReserveMatch() {
   const { search } = useLocation();
+  console.log("time", new Date().getSeconds());
 
   const matchID = new URLSearchParams(search).get(`matchId`);
+  const [time, setTime] = React.useState(new Date().getSeconds());
 
   const [formModal, setFormModal] = React.useState(false);
   const [card, setCard] = React.useState({
@@ -154,7 +158,7 @@ export default function ReserveMatch() {
 
     console.log("finalSeats", finalSeats);
     axios
-      .post("https://world-cup-backend-g3yn.onrender.com/api/tickets/", {
+      .post("https://careful-elk-petticoat.cyclic.app/api/tickets/", {
         username: "Alii",
         matchId: matchID,
         seat: finalSeats,
@@ -175,7 +179,7 @@ export default function ReserveMatch() {
   const fetchSeats = async () => {
     const r = await axios
       .get(
-        `https://world-cup-backend-g3yn.onrender.com/api/match/seats/${matchID}`
+        `https://careful-elk-petticoat.cyclic.app/api/match/seats/${matchID}`
       )
       .then((res) => {
         console.log(res.data.data.seats);
@@ -188,6 +192,7 @@ export default function ReserveMatch() {
 
   React.useEffect(() => {
     fetchSeats();
+
     document.body.classList.toggle("register-page");
     document.documentElement.addEventListener("mousemove", followCursor);
     // Specify how to clean up after this effect:
@@ -196,6 +201,10 @@ export default function ReserveMatch() {
       document.documentElement.removeEventListener("mousemove", followCursor);
     };
   }, []);
+
+  React.useEffect(() => {
+    console.log(time);
+  }, [time]);
 
   React.useEffect(() => {
     console.log(data);
@@ -227,239 +236,224 @@ export default function ReserveMatch() {
     <>
       <ExamplesNavbar />
       <div className="wrapper">
-        <div className="page-header">
-          <div className="page-header-image" />
-          <div className="content">
-            <Container>
-              <Row className="justify-content-md-center">
-                <Col className="offset-lg-0 offset-md-3">
-                  <div
-                    className="square square-7"
-                    id="square7"
-                    style={{ transform: squares7and8 }}
-                  />
-                  <div
-                    className="square square-8"
-                    id="square8"
-                    style={{ transform: squares7and8 }}
-                  />
-                  <Card className="card-register">
-                    <CardHeader>
-                      <CardImg
-                        alt="..."
-                        src={require("assets/img/square-purple-1.png")}
-                      />
-                      <CardTitle
-                        tag="h4"
-                        style={{
-                          color: "white",
-                          fontFamily: "Qatar2022Arabic-Bold",
-                        }}
-                      >
-                        select seats
-                      </CardTitle>
-                    </CardHeader>
-                    <CardBody>
-                      <Form className="form"></Form>
-                      <Row className="justify-content-md-center">
-                        <Col>
-                          {seats.map((r) => {
-                            return (
-                              <Row
-                                style={{
-                                  marginLeft: "5px",
-                                  textAlign: "center",
-                                }}
-                              >
-                                {r.map((s) => {
-                                  return (
-                                    <Button
-                                      color="info"
-                                      size="sm"
-                                      disabled={s.isTaken ? true : false}
-                                      onClick={() =>
-                                        handleSeatClick({
-                                          seatRow: s.row,
-                                          seatCol: s.col,
-                                          id: `${s.row}${s.col}`,
-                                        })
-                                      }
-                                      id={`${s.row}${s.col}`}
-                                      style={{
-                                        width: "20px",
-                                        height: " 20px",
-                                        padding: "0",
-                                        fontSize: "10px",
-                                      }}
-                                      seatRow={s.row}
-                                      seatCol={s.col}
-                                    >
-                                      {s.row}
-                                      {s.col}
-                                    </Button>
-                                  );
-                                })}
-                              </Row>
-                            );
-                          })}
-
-                          {selectedSeats.length == 0 ? (
-                            <div
-                              style={{ marginTop: "20px", textAlign: "center" }}
-                            >
-                              <h3>Please select a seat first</h3>
-                            </div>
-                          ) : (
-                            <div
-                              style={{ marginTop: "20px", textAlign: "center" }}
-                            >
-                              <h3
-                                style={{ marginBottom: "0", fontWeight: "600" }}
-                              >
-                                Quantity
-                              </h3>
-                              <h4>{selectedSeats.length}</h4>
-
-                              <h3
-                                style={{ marginBottom: "0", fontWeight: "600" }}
-                              >
-                                Price
-                              </h3>
-                              <h4>{selectedSeats.length * 50}</h4>
-                            </div>
-                          )}
-                        </Col>
-                      </Row>
-                    </CardBody>
-                    <CardFooter>
-                      <Button
-                        className="btn"
-                        color="primary"
-                        size="lg"
-                        onClick={handleSubmit}
-                      >
-                        Reserve
-                      </Button>
-                      {isSuccess ? (
-                        <Alert color="success" style={{ marginTop: "20px" }}>
-                          Tickets reserved successflly.
-                        </Alert>
-                      ) : null}
-                      {isFailed ? (
-                        <Alert color="danger" style={{ marginTop: "20px" }}>
-                          Failed reserving tickets.
-                        </Alert>
-                      ) : null}
-                    </CardFooter>
-                  </Card>
-                </Col>
-                <Modal
-                  modalClassName="modal-black"
-                  isOpen={formModal}
-                  toggle={() => setFormModal(false)}
-                >
-                  <div className="modal-header justify-content-center">
-                    <button
-                      className="close"
-                      onClick={() => setFormModal(false)}
+        <div className="content-center brand" style={{ width: "100%" }}>
+          <Container style={{ marginTop: "200px" }}>
+            <Row className="justify-content-md-center">
+              <Col className="">
+                <Card className="card-register">
+                  <CardHeader>
+                    <CardImg
+                      alt="..."
+                      src={require("assets/img/square-purple-1.png")}
+                    />
+                    <CardTitle
+                      tag="h4"
+                      style={{
+                        color: "white",
+                        fontFamily: "Qatar2022Arabic-Bold",
+                      }}
                     >
-                      <i className="tim-icons icon-simple-remove text-white" />
-                    </button>
-                    <div className="text-muted text-center ml-auto mr-auto">
-                      <h3 className="mb-0">Payment</h3>
-                    </div>
+                      select seats
+                    </CardTitle>
+                  </CardHeader>
+                  <CardBody>
+                    <Form className="form"></Form>
+                    <Row className="justify-content-md-center">
+                      <Col>
+                        {seats.map((r) => {
+                          return (
+                            <Row
+                              style={{
+                                marginLeft: "5px",
+                                textAlign: "center",
+                              }}
+                            >
+                              {r.map((s) => {
+                                return (
+                                  <Button
+                                    color="info"
+                                    size="sm"
+                                    disabled={s.isTaken ? true : false}
+                                    onClick={() =>
+                                      handleSeatClick({
+                                        seatRow: s.row,
+                                        seatCol: s.col,
+                                        id: `${s.row}${s.col}`,
+                                      })
+                                    }
+                                    id={`${s.row}${s.col}`}
+                                    style={{
+                                      width: "20px",
+                                      height: " 20px",
+                                      padding: "0",
+                                      fontSize: "10px",
+                                    }}
+                                    seatRow={s.row}
+                                    seatCol={s.col}
+                                  >
+                                    {s.row}
+                                    {s.col}
+                                  </Button>
+                                );
+                              })}
+                            </Row>
+                          );
+                        })}
+
+                        {selectedSeats.length == 0 ? (
+                          <div
+                            style={{ marginTop: "20px", textAlign: "center" }}
+                          >
+                            <h3>Please select a seat first</h3>
+                          </div>
+                        ) : (
+                          <div
+                            style={{ marginTop: "20px", textAlign: "center" }}
+                          >
+                            <h3
+                              style={{ marginBottom: "0", fontWeight: "600" }}
+                            >
+                              Quantity
+                            </h3>
+                            <h4>{selectedSeats.length}</h4>
+
+                            <h3
+                              style={{ marginBottom: "0", fontWeight: "600" }}
+                            >
+                              Price
+                            </h3>
+                            <h4>{selectedSeats.length * 50}</h4>
+                          </div>
+                        )}
+                      </Col>
+                    </Row>
+                  </CardBody>
+                  <CardFooter>
+                    <Button
+                      className="btn"
+                      color="primary"
+                      size="lg"
+                      onClick={handleSubmit}
+                    >
+                      Reserve
+                    </Button>
+                    {isSuccess ? (
+                      <Alert color="success" style={{ marginTop: "20px" }}>
+                        Tickets reserved successflly.
+                      </Alert>
+                    ) : null}
+                    {isFailed ? (
+                      <Alert color="danger" style={{ marginTop: "20px" }}>
+                        Failed reserving tickets.
+                      </Alert>
+                    ) : null}
+                  </CardFooter>
+                </Card>
+              </Col>
+              <Modal
+                modalClassName="modal-black"
+                isOpen={formModal}
+                toggle={() => setFormModal(false)}
+              >
+                <div className="modal-header justify-content-center">
+                  <button className="close" onClick={() => setFormModal(false)}>
+                    <i className="tim-icons icon-simple-remove text-white" />
+                  </button>
+                  <div className="text-muted text-center ml-auto mr-auto">
+                    <h3 className="mb-0">Payment</h3>
                   </div>
-                  <div className="modal-body">
-                    <div id="PaymentForm">
-                      <Cards
-                        cvc={card.cvc}
-                        expiry={card.expiry}
-                        focused={card.focus}
-                        name={card.name}
-                        number={card.number}
-                      />
-                      <div style={{ marginTop: "20px", textAlign: "center" }}>
-                        <h3 style={{ marginBottom: "0", fontWeight: "600" }}>
-                          Total Payment
-                        </h3>
-                        <h4>{selectedSeats.length * 50} EGP</h4>
-                      </div>
-                      <form style={{ marginTop: "20px" }}>
-                        <InputGroup
-                        // className={classnames({
-                        //   "input-group-focus": addressFocus,
-                        // })}
-                        >
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              {/* <i className="fa fa-map-pin"></i>{" "} */}
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Input
-                            type="tel"
-                            name="number"
-                            placeholder="Card Number"
-                            onChange={handleInputChange}
-                            onFocus={handleInputFocus}
-                          />
-                        </InputGroup>
-                        <InputGroup
-                        // className={classnames({
-                        //   "input-group-focus": addressFocus,
-                        // })}
-                        >
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              {/* <i className="fa fa-map-pin"></i>{" "} */}
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Input
-                            type="text"
-                            name="name"
-                            placeholder="Card Name"
-                            onChange={handleInputChange}
-                            onFocus={handleInputFocus}
-                          />
-                        </InputGroup>
-                        <InputGroup
-                        // className={classnames({
-                        //   "input-group-focus": addressFocus,
-                        // })}
-                        >
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              {/* <i className="fa fa-map-pin"></i>{" "} */}
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Input
-                            type="number"
-                            name="expiry"
-                            placeholder="Expiry Date"
-                            onChange={handleInputChange}
-                            onFocus={handleInputFocus}
-                          />
-                        </InputGroup>
-                        <InputGroup
-                        // className={classnames({
-                        //   "input-group-focus": addressFocus,
-                        // })}
-                        >
-                          <InputGroupAddon addonType="prepend">
-                            <InputGroupText>
-                              {/* <i className="fa fa-map-pin"></i>{" "} */}
-                            </InputGroupText>
-                          </InputGroupAddon>
-                          <Input
-                            type="tel"
-                            name="cvc"
-                            placeholder="CVC"
-                            onChange={handleInputChange}
-                            onFocus={handleInputFocus}
-                          />
-                        </InputGroup>
-                      </form>
+                </div>
+                <div className="modal-body">
+                  <div id="PaymentForm">
+                    <Cards
+                      cvc={card.cvc}
+                      expiry={card.expiry}
+                      focused={card.focus}
+                      name={card.name}
+                      number={card.number}
+                    />
+                    <div style={{ marginTop: "20px", textAlign: "center" }}>
+                      <h3 style={{ marginBottom: "0", fontWeight: "600" }}>
+                        Total Payment
+                      </h3>
+                      <h4>{selectedSeats.length * 50} EGP</h4>
                     </div>
-                    {/* <Form className="form">
+                    <form style={{ marginTop: "20px" }}>
+                      <InputGroup
+                      // className={classnames({
+                      //   "input-group-focus": addressFocus,
+                      // })}
+                      >
+                        <InputGroupAddon addonType="prepend">
+                          <InputGroupText>
+                            {/* <i className="fa fa-map-pin"></i>{" "} */}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                        <Input
+                          type="tel"
+                          name="number"
+                          placeholder="Card Number"
+                          onChange={handleInputChange}
+                          onFocus={handleInputFocus}
+                        />
+                      </InputGroup>
+                      <InputGroup
+                      // className={classnames({
+                      //   "input-group-focus": addressFocus,
+                      // })}
+                      >
+                        <InputGroupAddon addonType="prepend">
+                          <InputGroupText>
+                            {/* <i className="fa fa-map-pin"></i>{" "} */}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                        <Input
+                          type="text"
+                          name="name"
+                          placeholder="Card Name"
+                          onChange={handleInputChange}
+                          onFocus={handleInputFocus}
+                        />
+                      </InputGroup>
+                      <InputGroup
+                      // className={classnames({
+                      //   "input-group-focus": addressFocus,
+                      // })}
+                      >
+                        <InputGroupAddon addonType="prepend">
+                          <InputGroupText>
+                            {/* <i className="fa fa-map-pin"></i>{" "} */}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                        <Input
+                          type="number"
+                          name="expiry"
+                          placeholder="Expiry Date"
+                          onChange={handleInputChange}
+                          onFocus={handleInputFocus}
+                        />
+                      </InputGroup>
+                      <InputGroup
+                      // className={classnames({
+                      //   "input-group-focus": addressFocus,
+                      // })}
+                      >
+                        <InputGroupAddon addonType="prepend">
+                          <InputGroupText>
+                            {/* <i className="fa fa-map-pin"></i>{" "} */}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                        <Input
+                          type="tel"
+                          name="cvc"
+                          placeholder="CVC"
+                          onChange={handleInputChange}
+                          onFocus={handleInputFocus}
+                        />
+                      </InputGroup>
+                    </form>
+                  </div>
+                  {/* <Form className="form">
                       <InputGroup
                         className={classnames({
                           "input-group-focus": creditCardNumber,
@@ -535,50 +529,19 @@ export default function ReserveMatch() {
                       </InputGroup>
 
                     </Form> */}
-                    <Button
-                      className="btn"
-                      color="primary"
-                      size="md"
-                      onClick={handleSubmitPay}
-                    >
-                      Pay
-                    </Button>
-                  </div>
-                </Modal>
-              </Row>
-              <div className="register-bg" />
-              <div
-                className="square square-1"
-                id="square1"
-                style={{ transform: squares1to6 }}
-              />
-              <div
-                className="square square-2"
-                id="square2"
-                style={{ transform: squares1to6 }}
-              />
-              <div
-                className="square square-3"
-                id="square3"
-                style={{ transform: squares1to6 }}
-              />
-              <div
-                className="square square-4"
-                id="square4"
-                style={{ transform: squares1to6 }}
-              />
-              <div
-                className="square square-5"
-                id="square5"
-                style={{ transform: squares1to6 }}
-              />
-              <div
-                className="square square-6"
-                id="square6"
-                style={{ transform: squares1to6 }}
-              />
-            </Container>
-          </div>
+                  <Button
+                    className="btn"
+                    color="primary"
+                    size="md"
+                    onClick={handleSubmitPay}
+                  >
+                    Pay
+                  </Button>
+                </div>
+              </Modal>
+            </Row>
+            <div className="register-bg" />
+          </Container>
         </div>
         <Footer />
       </div>

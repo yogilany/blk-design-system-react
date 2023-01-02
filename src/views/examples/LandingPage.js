@@ -125,7 +125,7 @@ export default function LandingPage() {
 
   const fetchMatches = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/match")
+      .get("https://careful-elk-petticoat.cyclic.app/api/match")
       .then((res) => {
         setMatches(res.data.data);
         setIsLoading(false);
@@ -137,94 +137,9 @@ export default function LandingPage() {
 
   const data = React.useMemo(() => [...matches], [matches]);
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "Home Team",
-        accessor: "t1", // accessor is the "key" in the data
-      },
-      {
-        Header: "Away Team",
-        accessor: "t2",
-      },
-      {
-        Header: "Stadium",
-        accessor: "stadium",
-      },
-      {
-        Header: "Date",
-        accessor: "date",
-      },
-      {
-        Header: "Time",
-        accessor: "time",
-      },
-      {
-        Cell: (data) => {
-          const { row } = data;
-          const { original } = row;
-
-          return (
-            <>
-              {userRole == "manager" ? (
-                <Button
-                  color="info"
-                  size="sm"
-                  onClick={() => setFormModal(true)}
-                >
-                  Edit
-                </Button>
-              ) : (
-                <Link to="/reservation-page" state={{ original }}>
-                  <Button
-                    color="info"
-                    size="sm"
-                    onClick={() => console.log(original)}
-                  >
-                    Reservee
-                  </Button>
-                </Link>
-              )}
-            </>
-          );
-        },
-        // Header: `Actions`,
-        accessor: (data) => ({ id: data.id }),
-        id: `Details`,
-      },
-      {
-        Cell: (data) => {
-          const { row } = data;
-          const { original } = row;
-
-          return (
-            <>
-              {userRole == "manager" ? (
-                <Button
-                  color="danger"
-                  size="sm"
-                  onClick={() => setFormDeleteModal(true)}
-                >
-                  Delete
-                </Button>
-              ) : null}
-            </>
-          );
-        },
-        // Header: `Delete`,
-        accessor: (data) => ({ id: data.id }),
-        id: `delete`,
-      },
-    ],
-    []
-  );
-
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data });
-
   const fetchRefs = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/refs")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/refs")
       .then((res) => {
         setRefs(res.data.data.seats);
       })
@@ -235,7 +150,7 @@ export default function LandingPage() {
 
   const fetchTeams = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/teams/")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/teams/")
       .then((res) => {
         setteams(res.data.data.seats);
       })
@@ -246,7 +161,7 @@ export default function LandingPage() {
 
   const fetchVenues = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/")
       .then((res) => {
         setVenues(res.data.data.venues);
       })
@@ -274,7 +189,7 @@ export default function LandingPage() {
 
   const updateMatch = () => {
     axios
-      .patch("https://world-cup-backend-g3yn.onrender.com/api/match/", {
+      .patch("https://careful-elk-petticoat.cyclic.app/api/match/", {
         team1: formData.team1,
         team2: formData.team2,
         venue: formData.venue,
@@ -299,6 +214,7 @@ export default function LandingPage() {
   };
 
   React.useEffect(() => {
+    console.log("matches data", matches);
     fetchMatches();
     fetchRefs();
     fetchTeams();
