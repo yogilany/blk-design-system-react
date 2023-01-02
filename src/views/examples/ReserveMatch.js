@@ -156,10 +156,12 @@ export default function ReserveMatch() {
       return { row: seat.row, col: seat.col };
     });
 
+    const un = localStorage.getItem("username");
+    console.log("unnnn", un);
     console.log("finalSeats", finalSeats);
     axios
       .post("https://careful-elk-petticoat.cyclic.app/api/tickets/", {
-        username: "Alii",
+        username: { un },
         matchId: matchID,
         seat: finalSeats,
       })
