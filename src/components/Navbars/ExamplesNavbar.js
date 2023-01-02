@@ -17,6 +17,7 @@
 */
 import React from "react";
 import { Link } from "react-router-dom";
+import authHeader from "auth/localStorage";
 // reactstrap components
 import {
   Button,
@@ -36,8 +37,7 @@ import {
   UncontrolledDropdown,
 } from "reactstrap";
 
-import authHeader from "auth/localStorage";
-const loggedIn = authHeader();
+const loggedIn = Object.keys(authHeader()).length ? true : false;
 
 export default function ExamplesNavbar(props) {
   console.log("ROLLLLEEE", loggedIn);
@@ -72,6 +72,11 @@ export default function ExamplesNavbar(props) {
   };
   const onCollapseExited = () => {
     setCollapseOut("");
+  };
+  const logout = () => {
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    window.location.reload();
   };
   return (
     <Navbar className={"fixed-top " + color} color-on-scroll="100" expand="lg">
@@ -141,51 +146,58 @@ export default function ExamplesNavbar(props) {
                 Menu
               </DropdownToggle>
               <DropdownMenu className="dropdown-with-icons">
-                {/* <DropdownItem href="https://demos.creative-tim.com/blk-design-system-react/#/documentation/overview">
-                  <i className="tim-icons icon-paper" />
-                  Documentation
-                </DropdownItem> */}
-                {loggedIn === "manager" ? (
-                  <DropdownItem tag={Link} to="/add-match-page">
-                    <i className="tim-icons icon-bullet-list-67" />
-                    Add a match
-                  </DropdownItem>
-                ) : null}
-                {loggedIn === "manager" ? (
-                  <DropdownItem tag={Link} to="/add-stadium-page">
-                    <i className="tim-icons icon-bullet-list-67" />
-                    Add a stadium
-                  </DropdownItem>
-                ) : null}
-                <DropdownItem tag={Link} to="/landing-page">
-                  <i className="tim-icons icon-image-02" />
-                  Matches
-                </DropdownItem>
-                {loggedIn === "manager" ? (
-                  <DropdownItem tag={Link} to="/stadiums-page">
-                    <i className="tim-icons icon-image-02" />
-                    Stadiums
-                  </DropdownItem>
-                ) : null}
-                {loggedIn === "fan" ? (
-                  <DropdownItem tag={Link} to="/reservations">
-                    <i className="tim-icons icon-image-02" />
-                    My reservations
-                  </DropdownItem>
-                ) : null}
-                {loggedIn === "admin" ? (
-                  <DropdownItem tag={Link} to="/requests">
-                    <i className="tim-icons icon-image-02" />
-                    Requests
-                  </DropdownItem>
-                ) : null}
-                {loggedIn === "admin" ? (
-                  <DropdownItem tag={Link} to="/users">
-                    <i className="tim-icons icon-image-02" />
-                    Managers
-                  </DropdownItem>
-                ) : null}
+                {loggedIn ? (
+                  <>
+                    {localStorage.getItem("role") === "manager" ? (
+                      <>
+                        <DropdownItem tag={Link} to="/add-match-page">
+                          <i className="tim-icons icon-bullet-list-67" />
+                          Add a match
+                        </DropdownItem>
+                        <DropdownItem tag={Link} to="/add-stadium-page">
+                          <i className="tim-icons icon-bullet-list-67" />
+                          Add a stadium
+                        </DropdownItem>
+                        <DropdownItem tag={Link} to="/stadiums-page">
+                          <i className="tim-icons icon-image-02" />
+                          Stadiums
+                        </DropdownItem>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+
+                    {localStorage.getItem("role") === "fan" ? (
+                      <DropdownItem tag={Link} to="/reservations">
+                        <i className="tim-icons icon-image-02" />
+                        My reservations
+                      </DropdownItem>
+                    ) : (
+                      <></>
+                    )}
+                    {localStorage.getItem("role") === "admin" ? (
+                      <>
+                        <DropdownItem tag={Link} to="/requests">
+                          <i className="tim-icons icon-image-02" />
+                          Requests
+                        </DropdownItem>
+                        <DropdownItem tag={Link} to="/users">
+                          <i className="tim-icons icon-image-02" />
+                          Managers
+                        </DropdownItem>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
               </DropdownMenu>
+              <DropdownItem tag={Link} to="/landing-page">
+                <i className="tim-icons icon-image-02" />
+                Matches
+              </DropdownItem>
             </UncontrolledDropdown>
 
             <NavItem>
@@ -193,16 +205,21 @@ export default function ExamplesNavbar(props) {
                 My Profile
               </NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink tag={Link} to="/login">
-                Log out
-              </NavLink>
-            </NavItem>
-            {/* <NavItem>
-              <NavLink href="https://github.com/creativetimofficial/blk-design-system-react/issues">
-                Have an issue?
-              </NavLink>
-            </NavItem> */}
+            {!loggedIn ? (
+              <>
+                <NavItem>
+                  <NavLink tag={Link} to="/login">
+                    Login
+                  </NavLink>
+                </NavItem>
+              </>
+            ) : (
+              <>
+                <NavItem>
+                  <NavLink onClick={logout}>Log Out</NavLink>
+                </NavItem>
+              </>
+            )}
           </Nav>
         </Collapse>
       </Container>
