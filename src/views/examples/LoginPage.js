@@ -55,12 +55,11 @@ export default function LoginPage() {
   const formChangeHandler = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
-
-  const postSignIn = (e) => {
-    console.log("userData", userData);
-    axios
+  const login = (user) => {
+    console.log(user);
+    return axios
       .post(
-        "https://world-cup-backend-g3yn.onrender.com/api/users/authenticate/",
+        "https://careful-elk-petticoat.cyclic.app/api/users/authenticate/",
         userData
       )
       .then((res) => {
@@ -69,14 +68,23 @@ export default function LoginPage() {
           localStorage.setItem("username", res.data.data.user_name);
           localStorage.setItem("role", res.data.data.role);
         }
-        // window.location.href = "/";
-      })
-      .catch((err) => {
+        return res.data;
+      });
+  };
+  const postSignIn = (e) => {
+    console.log("a");
+    login(e).then(
+      (res) => {
+        console.log("response: ", res);
+        window.location.href = "/";
+      },
+      (err) => {
         if (err.response.status === 500) {
           alert("user not found");
         }
         console.log("error: ", err);
-      })();
+      }
+    );
   };
   const [userData, setUserData] = React.useState({
     username: "",
