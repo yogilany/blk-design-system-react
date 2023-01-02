@@ -51,6 +51,9 @@ export default function LoginPage() {
   const [fullNameFocus, setFullNameFocus] = React.useState(false);
   const [emailFocus, setEmailFocus] = React.useState(false);
   const [passwordFocus, setPasswordFocus] = React.useState(false);
+  const [isRejected, setIsRejected] = React.useState(false);
+  const [isError, setIsError] = React.useState(false);
+  const [isReviewing, setIsReviewing] = React.useState(false);
 
   const formChangeHandler = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -79,10 +82,19 @@ export default function LoginPage() {
         window.location.href = "/";
       },
       (err) => {
-        if (err.response.status === 500) {
-          alert("user not found");
+        if (
+          err.response.data.message ===
+          "cannot authenticate : Manager not yet confirmed"
+        ) {
+          setIsReviewing(true);
+          setIsError(false);
+        } else if (
+          (err.response.data.message = "username and password deoesnt match")
+        ) {
+          setIsReviewing(false);
+          setIsError(true);
         }
-        console.log("error: ", err);
+        console.log("error: ", err.response.data.message);
       }
     );
   };
@@ -211,6 +223,16 @@ export default function LoginPage() {
                       >
                         Login
                       </Button>
+                      {isError ? (
+                        <p className="text-danger">
+                          Username and password don't match.
+                        </p>
+                      ) : null}
+                      {isReviewing ? (
+                        <p className="text-danger">
+                          Your request has not been reviewed yet.
+                        </p>
+                      ) : null}
                     </CardFooter>
                   </Card>
                 </Col>

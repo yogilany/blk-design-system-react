@@ -72,12 +72,14 @@ export default function Profile() {
   });
 
   const fetchProfile = async () => {
+    setIsLoading(true);
     const userName = localStorage.getItem("username");
     const r = await axios
-      .get(`https://world-cup-backend-g3yn.onrender.com/api/users/${userName}`)
+      .get(`https://careful-elk-petticoat.cyclic.app/api/users/${userName}`)
       .then((res) => {
         console.log(res.data.data);
         setUserData(res.data.data);
+        setIsLoading(false);
       })
       .catch((err) => {
         console.log(err);
@@ -172,87 +174,95 @@ export default function Profile() {
                         My Profile
                       </CardTitle>
                     </CardHeader>
-                    <CardBody>
-                      <div className="px-md-2">
-                        <hr className="line-success" />
-                        <h3>
-                          {userData.fname} {userData.lname}
-                        </h3>
+                    {!isLoading ? (
+                      <CardBody>
+                        <div className="px-md-2">
+                          <hr className="line-success" />
+                          <h3>
+                            {userData.fname} {userData.lname}
+                          </h3>
 
-                        {/* <p>
+                          {/* <p>
                           The design system comes with three pre-built pages to
                           help you get started faster. You can change the text
                           and images and you're good to go.
                         </p> */}
-                        <ul className="list-unstyled mt-5">
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-single-02" />
+                          <ul className="list-unstyled mt-5">
+                            <li className="py-2">
+                              <div className="d-flex align-items-center">
+                                <div className="icon icon-success mb-2">
+                                  <i className="tim-icons icon-single-02" />
+                                </div>
+                                <div className="ml-3">
+                                  <h6>username | {userData.user_name}</h6>
+                                </div>
                               </div>
-                              <div className="ml-3">
-                                <h6>{userData.user_name}</h6>
+                            </li>
+                            <li className="py-2">
+                              <div className="d-flex align-items-center">
+                                <div className="icon icon-success mb-2">
+                                  <i className="tim-icons icon-single-02" />
+                                </div>
+                                <div className="ml-3">
+                                  <h6>email | {userData.email}</h6>
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-single-02" />
+                            </li>
+                            <li className="py-2">
+                              <div className="d-flex align-items-center">
+                                <div className="icon icon-success mb-2">
+                                  <i className="tim-icons icon-vector" />
+                                </div>
+                                <div className="ml-3">
+                                  <h6>
+                                    birthdate |{" "}
+                                    {dayjs(userData.bdate).format("YYYY-MM-DD")}
+                                  </h6>
+                                </div>
                               </div>
-                              <div className="ml-3">
-                                <h6>{userData.email}</h6>
+                            </li>
+                            <li className="py-2">
+                              <div className="d-flex align-items-center">
+                                <div className="icon icon-success mb-2">
+                                  <i className="tim-icons icon-tap-02" />
+                                </div>
+                                <div className="ml-3">
+                                  <h6>nationality | {userData.nationality}</h6>
+                                </div>
                               </div>
-                            </div>
-                          </li>
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-vector" />
+                            </li>
+                            <li className="py-2">
+                              <div className="d-flex align-items-center">
+                                <div className="icon icon-success mb-2">
+                                  <i className="tim-icons icon-single-02" />
+                                </div>
+                                <div className="ml-3">
+                                  <h6>
+                                    gender |
+                                    {userData.gender === "M"
+                                      ? "Male"
+                                      : "Female"}
+                                  </h6>
+                                </div>
                               </div>
-                              <div className="ml-3">
-                                <h6>
-                                  {dayjs(userData.bdate).format("YYYY-MM-DD")}
-                                </h6>
-                              </div>
-                            </div>
-                          </li>
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-tap-02" />
-                              </div>
-                              <div className="ml-3">
-                                <h6>{userData.nationality}</h6>
-                              </div>
-                            </div>
-                          </li>
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-single-02" />
-                              </div>
-                              <div className="ml-3">
-                                <h6>
-                                  {userData.gender === "M" ? "Male" : "Female"}
-                                </h6>
-                              </div>
-                            </div>
-                          </li>
+                            </li>
 
-                          <li className="py-2">
-                            <div className="d-flex align-items-center">
-                              <div className="icon icon-success mb-2">
-                                <i className="tim-icons icon-single-02" />
+                            <li className="py-2">
+                              <div className="d-flex align-items-center">
+                                <div className="icon icon-success mb-2">
+                                  <i className="tim-icons icon-single-02" />
+                                </div>
+                                <div className="ml-3">
+                                  <h6>role | {userData.role}</h6>
+                                </div>
                               </div>
-                              <div className="ml-3">
-                                <h6>{userData.role}</h6>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </CardBody>
+                            </li>
+                          </ul>
+                        </div>
+                      </CardBody>
+                    ) : (
+                      <h1>Loading</h1>
+                    )}
                     <CardFooter>
                       <Button
                         className="btn-round"

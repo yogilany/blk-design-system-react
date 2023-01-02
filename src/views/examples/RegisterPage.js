@@ -107,7 +107,7 @@ export default function RegisterPage() {
 
   const postRegisteration = (e) => {
     axios
-      .post("https://world-cup-backend-g3yn.onrender.com/api/users/", userData)
+      .post("https://careful-elk-petticoat.cyclic.app/api/users/", userData)
       .then((res) => {
         console.log("response: ", res);
         window.location.href = "/login";

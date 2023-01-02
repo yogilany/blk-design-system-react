@@ -39,6 +39,7 @@ import {
   Table,
   Modal,
   Alert,
+  Badge,
 } from "reactstrap";
 
 // core components
@@ -161,7 +162,7 @@ export default function ReserveMatch() {
     console.log("finalSeats", finalSeats);
     axios
       .post("https://careful-elk-petticoat.cyclic.app/api/tickets/", {
-        username: { un },
+        username: un,
         matchId: matchID,
         seat: finalSeats,
       })
@@ -207,6 +208,10 @@ export default function ReserveMatch() {
   React.useEffect(() => {
     console.log(time);
   }, [time]);
+
+  React.useEffect(() => {
+    fetchSeats();
+  }, []);
 
   React.useEffect(() => {
     console.log(data);
@@ -262,6 +267,7 @@ export default function ReserveMatch() {
                     <Form className="form"></Form>
                     <Row className="justify-content-md-center">
                       <Col>
+                        <h3>Stadium Direction</h3>
                         {seats.map((r) => {
                           return (
                             <Row
@@ -288,7 +294,7 @@ export default function ReserveMatch() {
                                       width: "20px",
                                       height: " 20px",
                                       padding: "0",
-                                      fontSize: "10px",
+                                      fontSize: "8px",
                                     }}
                                     seatRow={s.row}
                                     seatCol={s.col}
@@ -303,28 +309,18 @@ export default function ReserveMatch() {
                         })}
 
                         {selectedSeats.length == 0 ? (
-                          <div
-                            style={{ marginTop: "20px", textAlign: "center" }}
-                          >
-                            <h3>Please select a seat first</h3>
+                          <div style={{ marginTop: "20px" }}>
+                            <h5>Please select a seat first</h5>
                           </div>
                         ) : (
-                          <div
-                            style={{ marginTop: "20px", textAlign: "center" }}
-                          >
-                            <h3
-                              style={{ marginBottom: "0", fontWeight: "600" }}
-                            >
-                              Quantity
-                            </h3>
-                            <h4>{selectedSeats.length}</h4>
-
-                            <h3
-                              style={{ marginBottom: "0", fontWeight: "600" }}
-                            >
-                              Price
-                            </h3>
-                            <h4>{selectedSeats.length * 50}</h4>
+                          <div style={{ marginTop: "20px" }}>
+                            {" "}
+                            <Badge color="danger">
+                              Quantity: {selectedSeats.length}
+                            </Badge>
+                            <Badge color="default">
+                              Total cost: {selectedSeats.length * 50}
+                            </Badge>
                           </div>
                         )}
                       </Col>

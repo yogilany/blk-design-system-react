@@ -156,7 +156,7 @@ export default function StadiumsPage() {
 
   const fetchVenues = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/venue/")
+      .get("https://careful-elk-petticoat.cyclic.app/api/venue/")
       .then((res) => {
         console.log(res.data.data);
         setVenues(res.data.data.venues);

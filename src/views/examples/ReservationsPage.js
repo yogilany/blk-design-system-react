@@ -90,6 +90,7 @@ export default function ReservationsPage() {
   };
 
   const DeleterReservation = (e) => {
+    console.log("register id", e);
     axios
       .delete(`https://careful-elk-petticoat.cyclic.app/api/tickets/${e}/`)
       .then((res) => {
@@ -101,6 +102,8 @@ export default function ReservationsPage() {
         fetchReservations();
       })
       .catch((err) => {
+        setFormModal(false);
+
         setIsSuccess2(false);
         setIsFiled2(true);
         console.log("error: ", err);
@@ -115,13 +118,20 @@ export default function ReservationsPage() {
           const { original } = s.row;
 
           return (
-            <span>
-              {original.match_id} {original.lname}
+            <span style={{ fontWeight: "600" }}>
+              {original.t1} Vs. {original.t2}
             </span>
           );
         },
-        Header: "Match ID",
-        accessor: "match",
+        Header: "Teams",
+      },
+      {
+        Header: "Date",
+        accessor: "date",
+      },
+      {
+        Header: "Time",
+        accessor: "time",
       },
 
       {
@@ -148,7 +158,7 @@ export default function ReservationsPage() {
               color="danger"
               size="sm"
               onClick={() => {
-                setSelectedReservations(original.id);
+                setSelectedReservations(original.tid);
                 setFormModal(true);
               }}
             >
@@ -169,11 +179,12 @@ export default function ReservationsPage() {
     const userNamee = localStorage.getItem("username");
     console.log("username", userNamee);
     const r = await axios
-      .get(`https://careful-elk-petticoat.cyclic.app/api/tickets/Alii/`)
+      .get(`https://careful-elk-petticoat.cyclic.app/api/tickets/${userNamee}/`)
       .then((res) => {
         console.log(res.data.data.tickets);
         setReservations(res.data.data.tickets);
         setIsLoading(false);
+        setFormModal(false);
       })
       .catch((err) => {
         console.log(err);
@@ -219,7 +230,7 @@ export default function ReservationsPage() {
             ) : null}
             {isFailed2 ? (
               <Alert color="danger" style={{ marginTop: "20px" }}>
-                Failed deleting the reservation.
+                Cannot delete a passed reservation.
               </Alert>
             ) : null}
             <Table {...getTableProps()} responsive>

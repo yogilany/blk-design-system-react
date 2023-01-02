@@ -159,6 +159,19 @@ export default function LandingPage() {
       });
   };
 
+  const fetchSeatsCount = async () => {
+    const r = await axios
+      .get(
+        "https://careful-elk-petticoat.cyclic.app/api/match/seatscount/${matchID}"
+      )
+      .then((res) => {
+        setteams(res.data.data.seats);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const fetchVenues = async () => {
     const r = await axios
       .get("https://careful-elk-petticoat.cyclic.app/api/venue/")
@@ -188,17 +201,28 @@ export default function LandingPage() {
   };
 
   const updateMatch = () => {
+    console.log({
+      team1: formData.t1,
+      team2: formData.t2,
+      venue: formData.venue,
+      referee: formData.ref,
+      lineman1: formData.lineman1,
+      lineman2: formData.lineman2,
+      date: formData.date,
+      time: formData.time,
+      id: selectedMatch,
+    });
     axios
       .patch("https://careful-elk-petticoat.cyclic.app/api/match/", {
-        team1: formData.team1,
-        team2: formData.team2,
+        team1: formData.t1,
+        team2: formData.t2,
         venue: formData.venue,
-        referee: formData.referee,
+        referee: formData.ref,
         lineman1: formData.lineman1,
         lineman2: formData.lineman2,
         date: formData.date,
         time: formData.time,
-        id: selectedMatch.id,
+        id: selectedMatch,
       })
       .then((res) => {
         console.log("response: ", res);
@@ -371,20 +395,20 @@ export default function LandingPage() {
                             </ul>
                           </Col>
                           <Col md="auto" style={{ marginTop: "auto" }}>
-                            {USER_ROLE === "fan" ? (
+                            {localStorage.getItem("role") === "fan" ? (
                               <Link
                                 to={`/reservation-page?matchId=${match.id}`}
                               >
                                 <Button color="primary">Reserve</Button>
                               </Link>
                             ) : null}
-                            {USER_ROLE === "manager" ? (
+                            {localStorage.getItem("role") === "manager" ? (
                               <>
                                 <Button
                                   color="info"
                                   onClick={() => {
                                     console.log("match is", match);
-                                    setSelectedMatch(match);
+                                    setSelectedMatch(match.id);
 
                                     setFormModal(true);
                                   }}
@@ -457,6 +481,7 @@ export default function LandingPage() {
                       </InputGroupAddon>
                       <Input
                         name="t1"
+                        id="t1"
                         type="select"
                         onFocus={(e) => setTeam1Focus(true)}
                         onBlur={(e) => setTeam1Focus(false)}
@@ -482,12 +507,11 @@ export default function LandingPage() {
                       })}
                     >
                       <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          {/* <i className="tim-icons icon-single-02" /> */}
-                        </InputGroupText>
+                        <InputGroupText></InputGroupText>
                       </InputGroupAddon>
                       <Input
                         name="t2"
+                        id="t2"
                         type="select"
                         onFocus={(e) => setTeam2Focus(true)}
                         onBlur={(e) => setTeam2Focus(false)}
@@ -520,6 +544,7 @@ export default function LandingPage() {
                   </InputGroupAddon>
                   <Input
                     name="venue"
+                    id="venue"
                     type="select"
                     onFocus={(e) => setStadiumFocus(true)}
                     onBlur={(e) => setStadiumFocus(false)}
@@ -550,6 +575,7 @@ export default function LandingPage() {
                       </InputGroupAddon>
                       <Input
                         name="date"
+                        id="date"
                         placeholder="Date"
                         type="date"
                         defaultValue={dayjs(selectedMatch.date).format(
@@ -576,6 +602,7 @@ export default function LandingPage() {
                       </InputGroupAddon>
                       <Input
                         name="time"
+                        id="time"
                         placeholder="Time"
                         type="time"
                         value={selectedMatch.time}
@@ -601,6 +628,7 @@ export default function LandingPage() {
                   </InputGroupAddon>
                   <Input
                     name="ref"
+                    id="ref"
                     type="select"
                     onFocus={(e) => setRefereeFocus(true)}
                     onBlur={(e) => setRefereeFocus(false)}
@@ -632,6 +660,7 @@ export default function LandingPage() {
                       <Input
                         name="lineman1"
                         type="select"
+                        id="lineman1"
                         onFocus={(e) => setLineman1Focus(true)}
                         onBlur={(e) => setLineman1Focus(false)}
                         onChange={handleChange}
@@ -664,6 +693,7 @@ export default function LandingPage() {
                       </InputGroupAddon>
                       <Input
                         name="lineman2"
+                        id="lineman2"
                         type="select"
                         onFocus={(e) => setLineman2Focus(true)}
                         onBlur={(e) => setLineman2Focus(false)}

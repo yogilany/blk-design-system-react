@@ -230,7 +230,9 @@ export default function ExamplesNavbar(props) {
             ) : (
               <>
                 <NavItem>
-                  <NavLink onClick={logout}>Log Out</NavLink>
+                  <Link to="/login">
+                    <NavLink>Log Out</NavLink>
+                  </Link>
                 </NavItem>
               </>
             )}

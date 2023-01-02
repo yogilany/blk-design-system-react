@@ -171,7 +171,7 @@ export default function RequestPage() {
   const fetchRequests = async () => {
     setIsLoading(true);
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/users/pending/")
+      .get("https://careful-elk-petticoat.cyclic.app/api/users/pending/")
       .then((res) => {
         console.log(res.data.data);
         setRequests(res.data.data);

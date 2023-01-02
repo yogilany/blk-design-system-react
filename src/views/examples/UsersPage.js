@@ -43,6 +43,7 @@ import {
   Modal,
   Label,
   Spinner,
+  Alert,
 } from "reactstrap";
 
 // core components
@@ -61,9 +62,12 @@ const initialFormData = Object.freeze({
 
 export default function UsersPage() {
   const [users, setUsers] = React.useState([]);
-
+  const [isFailed2, setIsFiled2] = React.useState(false);
+  const [isSuccess2, setIsSuccess2] = React.useState(false);
   const [formDeleteModal, setFormDeleteModal] = React.useState(false);
   const [formAcceptModal, setFormcceptModal] = React.useState(false);
+  const [formModal, setFormModal] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState(false);
 
   const handleApprove = (e) => {
     setFormcceptModal(true);
@@ -71,8 +75,9 @@ export default function UsersPage() {
   };
 
   const handleReject = (e) => {
+    setSelectedUser(e.user_name);
     setFormDeleteModal(true);
-    console.log("eeee", e);
+    console.log("eetttttee", e);
   };
 
   const data = React.useMemo(() => [...users], [users]);
@@ -126,7 +131,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     const r = await axios
-      .get("https://world-cup-backend-g3yn.onrender.com/api/users/managers")
+      .get("https://careful-elk-petticoat.cyclic.app/api/users/managers")
       .then((res) => {
         console.log(res.data.data);
         setUsers(res.data.data);
@@ -134,6 +139,27 @@ export default function UsersPage() {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const DeleterUser = (e) => {
+    console.log("selectedUser", selectedUser);
+    axios
+      .delete(
+        `https://careful-elk-petticoat.cyclic.app/api/users/${selectedUser}`
+      )
+      .then((res) => {
+        console.log("response: ", res);
+        setFormModal(false);
+        setIsSuccess2(true);
+        setIsFiled2(false);
+
+        fetchUsers();
+      })
+      .catch((err) => {
+        setIsSuccess2(false);
+        setIsFiled2(true);
+        console.log("error: ", err);
+      })();
   };
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -203,6 +229,16 @@ export default function UsersPage() {
               >
                 Managers
               </h1>
+              {isSuccess2 ? (
+                <Alert color="success" style={{ marginTop: "20px" }}>
+                  User has been deleted successflly.
+                </Alert>
+              ) : null}
+              {isFailed2 ? (
+                <Alert color="danger" style={{ marginTop: "20px" }}>
+                  Failed deleting the user.
+                </Alert>
+              ) : null}
             </div>
             {users.length !== 0 ? (
               <Table {...getTableProps()} responsive>
@@ -265,7 +301,10 @@ export default function UsersPage() {
                 <Button
                   color="danger"
                   type="button"
-                  onClick={() => setFormDeleteModal(false)}
+                  onClick={() => {
+                    setFormDeleteModal(false);
+                    DeleterUser();
+                  }}
                 >
                   Confirm
                 </Button>
