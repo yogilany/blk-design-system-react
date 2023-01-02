@@ -133,6 +133,7 @@ export default function ExamplesNavbar(props) {
                 </Button>
               </Link>
             </NavItem>
+
             <UncontrolledDropdown nav>
               <DropdownToggle
                 caret
@@ -162,16 +163,26 @@ export default function ExamplesNavbar(props) {
                           <i className="tim-icons icon-image-02" />
                           Stadiums
                         </DropdownItem>
+                        <DropdownItem tag={Link} to="/landing-page">
+                          <i className="tim-icons icon-image-02" />
+                          Matches
+                        </DropdownItem>
                       </>
                     ) : (
                       <></>
                     )}
 
                     {localStorage.getItem("role") === "fan" ? (
-                      <DropdownItem tag={Link} to="/reservations">
-                        <i className="tim-icons icon-image-02" />
-                        My reservations
-                      </DropdownItem>
+                      <>
+                        <DropdownItem tag={Link} to="/reservations">
+                          <i className="tim-icons icon-image-02" />
+                          My reservations
+                        </DropdownItem>
+                        <DropdownItem tag={Link} to="/landing-page">
+                          <i className="tim-icons icon-image-02" />
+                          Matches
+                        </DropdownItem>
+                      </>
                     ) : (
                       <></>
                     )}
@@ -191,20 +202,24 @@ export default function ExamplesNavbar(props) {
                     )}
                   </>
                 ) : (
-                  <></>
+                  <>
+                    <DropdownItem tag={Link} to="/landing-page">
+                      <i className="tim-icons icon-image-02" />
+                      Matches
+                    </DropdownItem>
+                  </>
                 )}
               </DropdownMenu>
-              <DropdownItem tag={Link} to="/landing-page">
-                <i className="tim-icons icon-image-02" />
-                Matches
-              </DropdownItem>
             </UncontrolledDropdown>
 
-            <NavItem>
-              <NavLink tag={Link} to="/profile-page">
-                My Profile
-              </NavLink>
-            </NavItem>
+            {loggedIn ? (
+              <NavItem>
+                <NavLink tag={Link} to="/profile-page">
+                  My Profile
+                </NavLink>
+              </NavItem>
+            ) : null}
+
             {!loggedIn ? (
               <>
                 <NavItem>
