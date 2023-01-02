@@ -42,6 +42,7 @@ import {
   Input,
   Modal,
   Label,
+  Alert,
 } from "reactstrap";
 
 // core components
@@ -49,6 +50,7 @@ import ExamplesNavbar from "components/Navbars/ExamplesNavbar.js";
 import Footer from "components/Footer/Footer.js";
 
 import { useTable } from "react-table";
+import axios from "axios";
 
 const initialFormData = Object.freeze({
   name: "",
@@ -66,6 +68,11 @@ export default function ReservationsPage() {
   const [shapeFocus, setShapeFocus] = React.useState(false);
   const [seatsFocus, setSeatsFocus] = React.useState(false);
   const [formData, updateFormData] = React.useState(initialFormData);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [reservations, setReservations] = React.useState([]);
+  const [selectedReservation, setSelectedReservations] = React.useState([]);
+  const [isFailed2, setIsFiled2] = React.useState(false);
+  const [isSuccess2, setIsSuccess2] = React.useState(false);
 
   const handleChange = (e) => {
     updateFormData({
@@ -82,33 +89,53 @@ export default function ReservationsPage() {
     // ... submit to API or something
   };
 
-  const data = React.useMemo(
-    () => [
-      {
-        match: "Egypt Vs. Spain",
-        date: "25 Jan 2023",
-      },
-      {
-        match: "Egypt Vs. Spain",
-        date: "25 Jan 2023",
-      },
-      {
-        match: "Egypt Vs. Spain",
-        date: "25 Jan 2023",
-      },
-    ],
-    []
-  );
+  const DeleterReservation = (e) => {
+    axios
+      .delete(`https://careful-elk-petticoat.cyclic.app/api/tickets/${e}/`)
+      .then((res) => {
+        console.log("response: ", res);
+        setFormModal(false);
+        setIsSuccess2(true);
+        setIsFiled2(false);
+
+        fetchReservations();
+      })
+      .catch((err) => {
+        setIsSuccess2(false);
+        setIsFiled2(true);
+        console.log("error: ", err);
+      })();
+  };
+  const data = React.useMemo(() => [...reservations], [reservations]);
 
   const columns = React.useMemo(
     () => [
       {
-        Header: "Match",
-        accessor: "match", // accessor is the "key" in the data
+        Cell: (s) => {
+          const { original } = s.row;
+
+          return (
+            <span>
+              {original.match_id} {original.lname}
+            </span>
+          );
+        },
+        Header: "Match ID",
+        accessor: "match",
       },
+
       {
-        Header: "Date",
-        accessor: "date",
+        Cell: (s) => {
+          const { original } = s.row;
+
+          return (
+            <span>
+              {original.seat_row} {original.seat_col}
+            </span>
+          );
+        },
+        Header: "Seat",
+        accessor: "seat",
       },
 
       {
@@ -121,6 +148,7 @@ export default function ReservationsPage() {
               color="danger"
               size="sm"
               onClick={() => {
+                setSelectedReservations(original.id);
                 setFormModal(true);
               }}
             >
@@ -136,10 +164,26 @@ export default function ReservationsPage() {
     []
   );
 
+  const fetchReservations = async () => {
+    setIsLoading(true);
+    const userNamee = localStorage.getItem("username");
+    console.log("username", userNamee);
+    const r = await axios
+      .get(`https://careful-elk-petticoat.cyclic.app/api/tickets/Alii/`)
+      .then((res) => {
+        console.log(res.data.data.tickets);
+        setReservations(res.data.data.tickets);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   React.useEffect(() => {
+    fetchReservations();
     document.body.classList.toggle("landing-page");
     // Specify how to clean up after this effect:
     return function cleanup() {
@@ -150,38 +194,8 @@ export default function ReservationsPage() {
     <>
       <ExamplesNavbar />
       <div className="wrapper">
-        <div className="page-header">
-          <img
-            alt="..."
-            className="path"
-            src={require("assets/img/blob.png")}
-          />
-          <img
-            alt="..."
-            className="path2"
-            src={require("assets/img/path2.png")}
-          />
-          <img
-            alt="..."
-            className="shapes triangle"
-            src={require("assets/img/triunghiuri.png")}
-          />
-          <img
-            alt="..."
-            className="shapes wave"
-            src={require("assets/img/waves.png")}
-          />
-          <img
-            alt="..."
-            className="shapes squares"
-            src={require("assets/img/patrat.png")}
-          />
-          <img
-            alt="..."
-            className="shapes circle"
-            src={require("assets/img/cercuri.png")}
-          />
-          <div className="content-center">
+        <div className="content-center brand" style={{ width: "100%" }}>
+          <Container style={{ marginTop: "200px" }}>
             <div>
               <h1
                 style={{
@@ -198,6 +212,16 @@ export default function ReservationsPage() {
                 Reservations
               </h1>
             </div>
+            {isSuccess2 ? (
+              <Alert color="success" style={{ marginTop: "20px" }}>
+                Reservation has been deleted successflly.
+              </Alert>
+            ) : null}
+            {isFailed2 ? (
+              <Alert color="danger" style={{ marginTop: "20px" }}>
+                Failed deleting the reservation.
+              </Alert>
+            ) : null}
             <Table {...getTableProps()} responsive>
               <thead>
                 {headerGroups.map((headerGroup) => (
@@ -244,13 +268,17 @@ export default function ReservationsPage() {
                 <Button
                   color="danger"
                   type="button"
-                  onClick={() => setFormModal(false)}
+                  onClick={() => {
+                    DeleterReservation(selectedReservation);
+
+                    setFormModal(false);
+                  }}
                 >
                   Delete
                 </Button>
               </div>
             </Modal>
-          </div>
+          </Container>
         </div>
 
         <Footer />
