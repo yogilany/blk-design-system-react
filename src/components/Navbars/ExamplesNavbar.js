@@ -40,7 +40,6 @@ import {
 const loggedIn = Object.keys(authHeader()).length ? true : false;
 
 export default function ExamplesNavbar(props) {
-  console.log("ROLLLLEEE", loggedIn);
   const [collapseOpen, setCollapseOpen] = React.useState(false);
   const [collapseOut, setCollapseOut] = React.useState("");
   const [color, setColor] = React.useState("navbar-transparent");
