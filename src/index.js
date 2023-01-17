@@ -89,6 +89,7 @@ root.render(
           path="/reservations"
           render={(props) => <ReservationsPage {...props} />}
         />
+        <Route path="*" render={(props) => <Index {...props} />} />
       </Switch>
     </BrowserRouter>
   </AuthProvider>
